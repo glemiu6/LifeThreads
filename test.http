@@ -1,0 +1,14 @@
+GET http://localhost:3000/api/users
+
+
+###
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{
+    "name":"vlad",
+    "email":"vla23d@gmail.com",
+    "password":"22223",
+    "bio":"eusouvlad",
+    "avatar":"localfiles"
+}
