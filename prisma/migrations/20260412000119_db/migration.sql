@@ -7,12 +7,30 @@ CREATE TYPE "Stat" AS ENUM ('ACCEPTED', 'PENDING', 'DECLINE');
 -- CreateEnum
 CREATE TYPE "Roles" AS ENUM ('ADMIN', 'COLLABORATOR', 'OBSERVER');
 
--- DropIndex
-DROP INDEX "Users_password_key";
+-- CreateTable
+CREATE TABLE "Users" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "bio" TEXT,
+    "avatar" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
--- AlterTable
-ALTER TABLE "Users" ALTER COLUMN "bio" DROP NOT NULL,
-ALTER COLUMN "avatar" DROP NOT NULL;
+    CONSTRAINT "Users_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Threads" (
+    "id" SERIAL NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "visibility" BOOLEAN NOT NULL DEFAULT false,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Threads_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "Entry" (
@@ -89,6 +107,12 @@ CREATE TABLE "Membership" (
 
     CONSTRAINT "Membership_pkey" PRIMARY KEY ("threadId","userId")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Users_email_key" ON "Users"("email");
+
+-- AddForeignKey
+ALTER TABLE "Threads" ADD CONSTRAINT "Threads_userId_fkey" FOREIGN KEY ("userId") REFERENCES "Users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Entry" ADD CONSTRAINT "Entry_threadId_fkey" FOREIGN KEY ("threadId") REFERENCES "Threads"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
