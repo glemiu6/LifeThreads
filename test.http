@@ -12,3 +12,15 @@ Content-Type: application/json
     "bio":"eusouvlad",
     "avatar":"localfiles"
 }
+
+
+###
+POST http://localhost:3000/api/threads
+Content-Type: application/json
+
+{
+    "userId":1,
+    "title":"Test1",
+    "description":"test thread"
+    
+}
