@@ -1,4 +1,7 @@
+import { threadId } from "node:worker_threads";
 import {prisma} from "../lib/prisma.js";
+import type { Roles, Stat } from "../generated/prisma/index.js";
+
 // Listar as Threads do utilizador
 export const findAllThreads = async(userId:number)=>{
     return await prisma.threads.findMany({
@@ -66,3 +69,44 @@ export const searchThreadsPublic = async(q:string)=>{
         ]}
     })
 };
+//Convidar utilizador para a Thread
+
+export const inviteUserToThread =async(threadsId:number, email:string,expires_at:Date)=>{
+    return await prisma.invite.create({
+        data:{ threadsId,
+            email,
+            expires_at,
+            status:'PENDING'
+        }
+    })
+}
+//Listar membros da Thread
+
+export const findThreadMembers = async(threadId:number)=>{
+    return await prisma.membership.findMany({
+        where:{threadId},
+        include:{user:{select:{id:true,name:true,avatar:true}}}
+    })};
+
+// alterar papel do membro
+
+export const updateMemberRole = async(threadId:number,userId:number,role:Roles)=>{
+    return await prisma.membership.update({
+        where:{threadId_userId:{threadId,userId}},
+        data:{role}
+    })
+}
+//remover membro
+
+export const removeMember = async(threadId:number,userId:number)=>{
+    return await prisma.membership.delete({
+        where:{threadId_userId:{threadId,userId}}
+    })
+}
+//sair de thread
+
+export const leaveThread = async(threadId:number,userId:number)=>{
+    return await prisma.membership.delete({
+        where:{threadId_userId:{threadId,userId}}
+    })
+}
