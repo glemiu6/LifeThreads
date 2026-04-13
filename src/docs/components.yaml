@@ -1,0 +1,48 @@
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        details:
+          type: array
+          items:
+            type: string
+
+    # 400 - validation errors
+    ThreadValidationError:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - example:
+            error: "Validation failed"
+            details:
+              - "title: Minimum 3 characters"
+              - "description: Required field"
+
+    # 403 - not the thread owner
+    ThreadForbiddenError:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - example:
+            error: "Forbidden"
+            details:
+              - "You are not the owner of this thread"
+
+    # 404 - thread not found
+    ThreadNotFoundError:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - example:
+            error: "Not found"
+            details:
+              - "Thread with id 42 does not exist"
+
+    # 409 - conflict (e.g. user already a member)
+    ThreadConflictError:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - example:
+            error: "Conflict"
+            details:
+              - "User is already a member of this thread"
