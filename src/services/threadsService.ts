@@ -1,6 +1,12 @@
-import { threadId } from "node:worker_threads";
 import {prisma} from "../lib/prisma.js";
-import type { Roles, Stat } from "../generated/prisma/index.js";
+import type { Roles } from "../generated/prisma/index.js";
+
+// listar threads
+export const getAllThreads= async()=>{
+    return await prisma.threads.findMany(
+    );
+}
+
 
 // Listar as Threads do utilizador
 export const findAllThreads = async(userId:number)=>{
