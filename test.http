@@ -6,11 +6,11 @@ POST http://localhost:3000/api/users
 Content-Type: application/json
 
 {
-    "name":"vlad",
-    "email":"vla23d@gmail.com",
-    "password":"22223",
-    "bio":"eusouvlad",
-    "avatar":"localfiles"
+    "name":"dana",
+    "email":"dana123@gmail.com",
+    "password":"dsds",
+    "bio":"dddada",
+    "avatar":"instagram.com/dana"
 }
 
 
@@ -19,9 +19,9 @@ POST http://localhost:3000/api/threads
 Content-Type: application/json
 
 {
-    "userId":4,
-    "title":"Test1",
-    "description":"test thread"
+    "userId":1,
+    "title":"school thread",
+    "description":"pascoa "
     
 }
 
@@ -29,4 +29,32 @@ Content-Type: application/json
 GET http://localhost:3000/api/threads
 
 ###
-GET http://localhost:3000/api/threads/4
+GET http://localhost:3000/api/threads/2/users
+
+###
+PUT http://localhost:3000/api/threads/4
+Content-Type: application/json
+
+{
+    "title": "pascoa thread",
+    "description": "thread para pascoa"
+}
+
+###
+
+DELETE http://localhost:3000/api/threads/1
+
+###
+PUT http://localhost:3000/api/threads/4/visibility
+Content-Type: application/json  
+
+{
+    "visibility": true
+}
+
+###
+GET http://localhost:3000/api/threads/explore
+
+
+###
+GET http://localhost:3000/api/threads/search?query=x
