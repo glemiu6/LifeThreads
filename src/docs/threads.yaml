@@ -1,0 +1,224 @@
+paths:
+  /api/threads:
+    post:
+      tags: [Threads]
+      summary: Create a new thread
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+                - title
+                - description
+              properties:
+                userId:
+                  type: integer
+                title:
+                  type: string
+                  exemple: "My First Thread"
+                  maxLength: 20
+                  minLength: 3
+                description:
+                  type: string
+                  exemple: "This is the description of my first thread."
+    responses:
+      201:
+        description: Thread created successfully
+      400:
+        description: Validation error
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThreadValidationError'
+
+    get:
+        tags: [Threads]
+        summary: Get all threads 
+        responses:
+          200:
+            description: List of threads
+
+          400:
+            description: Not found threads
+  
+  /api/threads/{id}:
+    get:
+      tags: [Threads]
+      summary: Get a thread by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Thread found successfully
+        404:
+          description: Thread not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadNotFoundError'
+    put:
+      tags: [Threads]
+      summary: Update a thread
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  maxLength: 20
+                  minLength: 3
+                description:
+                  type: string
+      responses:
+        200:
+          description: Thread updated successfully
+        400:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadValidationError'
+        403:
+          description: Forbidden (not the thread owner)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadForbiddenError'
+        404:
+          description: Thread not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadNotFoundError'
+    delete:
+      tags: [Threads]
+      summary: Delete a thread
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Thread deleted successfully
+        403:
+          description: Forbidden (not the thread owner)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadForbiddenError'
+        404:
+          description: Thread not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadNotFoundError'  
+  
+  /api/threads/{id}/visibility:
+    put:
+      tags: [Threads]
+      summary: Update thread visibility
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                visibility:
+                  type: boolean
+      responses:
+        200:
+          description: Thread visibility updated successfully
+        400:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadValidationError'
+        403:
+          description: Forbidden (not the thread owner)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadForbiddenError'
+        404:
+          description: Thread not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadNotFoundError'  
+
+  /api/threads/{id}/users:
+    get:
+      tags: [Threads]
+      summary: Get users of a thread
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: List of users in the thread
+        404:
+          description: Thread not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadNotFoundError'
+
+  /api/threads/explore:
+    get:
+      tags: [Threads]
+      summary: Explore public threads
+      responses:
+        200:
+          description: List of public threads
+        404:
+          description: No public threads found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadNotFoundError'
+
+  /api/threads/search:
+    get:
+      tags: [Threads]
+      summary: Search public threads by query
+      parameters:
+        - in: query
+          name: q
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: List of threads matching the search query
+        400:
+          description: Search query validation error
+         
