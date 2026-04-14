@@ -1,0 +1,31 @@
+import {type Request, type Response} from 'express';
+import * as NotificationService from "../services/notificationService.js";
+import { NotificationIdSchema, UpdateNotificationSchema } from "../schema/notificationSchema.js";
+
+
+  export const getByUser=async(req: Request, res: Response) =>{
+    
+      const result = NotificationIdSchema.safeParse(req.params.id);
+      if(!result.success){
+
+      }
+      const data = await NotificationService.getAllByUser(Number(req.params.id));
+      res.status(200).json(data);
+    
+  }
+
+  export const updateStatus=async(req: Request, res: Response)=> {
+    
+      const idNotif = NotificationIdSchema.safeParse(req.params.id)
+      const result  = UpdateNotificationSchema.safeParse(req.body);
+      if (!result.success){
+        return res.status(400).json({error:result.error.issues.map((issue)=>`${issue.path}: ${issue.message}`)});
+      }
+      if(!idNotif.success){
+        return res.status(404).json({error:idNotif.error.issues.map((issue)=>`${issue.path}: ${issue.message}`)});
+      }
+      const updated = await NotificationService.updateReadStatus(idNotif.data,result.data.is_read);
+      res.status(204).json(updated);
+    
+  }
+

@@ -1,7 +1,7 @@
 import express from 'express'
 import userRouter from './routes/userRoutes.js'
 import threadsRouter from './routes/threadsRoutes.js'
-import notificationRoutes from "./routes/notification.routes";
+import notificationRoutes from "./routes/notificationRoutes.js";
 import swaggerUi from "swagger-ui-express";
 import { specs } from "./lib/swagger.js";
 

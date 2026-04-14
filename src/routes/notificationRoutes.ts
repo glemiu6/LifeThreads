@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { NotificationController } from "../controllers/notification.controller";
+import * as NotificationController from "../controllers/notificationController.js";
 
 const router = Router();
 
@@ -18,19 +18,7 @@ const router = Router();
  */
 router.get("/user/:userId", NotificationController.getByUser);
 
-/**
- * @swagger
- * /api/notifications/{id}:
- * put:
- * summary: Atualiza estado da notificação
- * tags: [Notifications]
- * parameters:
- * - in: path
- * name: id
- * required: true
- * schema:
- * type: integer
- */
+
 router.put("/:id", NotificationController.updateStatus);
 
 export default router;

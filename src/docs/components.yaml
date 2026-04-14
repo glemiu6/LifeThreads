@@ -46,3 +46,21 @@ components:
             error: "Conflict"
             details:
               - "User is already a member of this thread"
+    
+
+    NotificationValidationError:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - example:
+          error: "Validation failed"
+          details:
+            - "is_read: must be a boolean"
+    NotificationNotFoundError:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - exemple:
+          error: "Users's Notification not found"
+          details:
+            - "User 42 doesn't have any notifications"
+
+    

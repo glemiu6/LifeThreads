@@ -1,0 +1,56 @@
+path:
+  /api/notifications/{id}:
+    put:
+      tags: [Notifications]
+      summary: Updates notification status
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                is_read:
+                  type: boolean
+      responses:
+        204:
+          description: Notification updated
+        400:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationValidationError'
+
+  /api/notification/user/{userId}:
+    get:
+      tags: [Notifications]
+      summary: Lists all the notification of a user
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Found the notification
+        400:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationValidationError'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationNotFoundError'
+          
