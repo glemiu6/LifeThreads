@@ -24,6 +24,9 @@ model Users {
   comments      Comment[]
   notifications Notification[]
   memberships   Membership[]
+  followers Following[] @relation("following")
+  following Following[] @relation("follower")
+  reaction EntryReaction[]
 }
 
 model Threads {
@@ -51,6 +54,8 @@ model Entry {
   created_at   DateTime  @default(now())
   media        Media[]
   comments     Comment[]
+  tags EntryTag[]
+  reaction EntryReaction[]
 }
 
 model Media {
@@ -65,6 +70,7 @@ model Tag {
   id      Int     @id @default(autoincrement())
   name    String
   is_auto Boolean @default(false)
+  entries EntryTag[]
 }
 
 model Comment {
@@ -108,9 +114,36 @@ model Membership {
 
 
 model Following{
+  follower Users @relation("follower", fields:[followerId],references:[id])
+  followerId Int
+  following Users @relation("following", fields:[followingId],references:[id])
+  followingId Int
+  created_at DateTime @default(now())
+
+  @@id([followerId,followingId])
+  
+}
+
+
+model EntryReaction{
+  id Int @id @default(autoincrement())
   user Users @relation(fields:[userId],references:[id])
   userId Int
-  
+  entry Entry @relation(fields:[entryId],references:[id])
+  entryId Int
+  type ReactionType
+  created_at DateTime @default(now())
+
+  @@unique([userId,entryId]) 
+}
+
+model EntryTag{
+  entry Entry @relation(fields:[entryId],references:[id])
+  entryId Int
+  tag Tag @relation(fields:[tagId],references:[id])
+  tagId Int
+
+  @@id([entryId,tagId])
 }
 enum Reaction {
   INVITE
@@ -128,4 +161,11 @@ enum Roles {
   ADMIN
   COLLABORATOR
   OBSERVER
+}
+
+enum ReactionType{
+  LIKE
+  HEART
+  DISLIKE
+  SHOCK
 }
