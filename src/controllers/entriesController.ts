@@ -1,11 +1,9 @@
 import { type Request, type Response } from 'express';
 import * as entriesService from '../services/entriesService.js';
-// Nota: Precisas de criar estes schemas num ficheiro `entriesSchema.ts` semelhante ao `threadsSchema.ts`
 import { createEntrySchema, entryIdSchema, updateEntrySchema } from '../schema/entriesSchema.js';
 
 export const createEntry = async (req: Request, res: Response) => {
-    const threadId = Number(req.params.threadId);
-    const { title, body, entry_date, location } = req.body;
+    const threadId = Number(req.params.id);
     
     const result = createEntrySchema.safeParse(req.body);
     if (!result.success) {
@@ -13,7 +11,7 @@ export const createEntry = async (req: Request, res: Response) => {
     }
 
     try {
-        const newEntry = await entriesService.createEntry(threadId, title, body, new Date(entry_date), location);
+        const newEntry = await entriesService.createEntry(threadId, result.data.title, result.data.body, req.body.location);
         res.status(201).json(newEntry);
     } catch (error) {
         res.status(500).json({ error: 'Failed to create entry' });
@@ -21,9 +19,8 @@ export const createEntry = async (req: Request, res: Response) => {
 };
 
 export const listEntriesByThread = async (req: Request, res: Response) => {
-    const threadId = Number(req.params.threadId);
+    const threadId = Number(req.params.id);
     
-    // De acordo com o PDF, aqui poderiam entrar os filtros: req.query.date, req.query.month, req.query.theme
     try {
         const entries = await entriesService.getEntriesByThread(threadId);
         res.status(200).json(entries);
