@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import * as threadsController from '../controllers/threadsController.js';
+import {createEntry,listEntriesByThread} from "../controllers/entriesController.js"
 
 const router = Router();
 
@@ -19,6 +20,8 @@ router.delete('/:id', threadsController.deleteThread);
 // ---- sub-resource routes ----
 router.put('/:id/visibility', threadsController.updateVisibilityThread);
 router.get('/:id/users', threadsController.listThreadsUsers);
+router.get('/:id/entries',listEntriesByThread)
+router.post('/:id/entries',createEntry)
 
 // ---- member routes (specific before dynamic routes) ----
 
