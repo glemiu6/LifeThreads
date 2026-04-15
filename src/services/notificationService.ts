@@ -1,3 +1,4 @@
+import type { Reaction } from "../generated/prisma/index.js";
 import {prisma} from "../lib/prisma.js";
 
 
@@ -13,5 +14,14 @@ export const updateReadStatus = async(id:number,is_read:boolean)=>{
   return await prisma.notification.update({
     where:{id},
     data:{is_read}
+  })
+}
+
+export const createNotification = async(userId:number,type:Reaction)=>{
+  return await prisma.notification.create({
+    data:{
+      userId,
+      type
+    }
   })
 }

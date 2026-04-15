@@ -1,4 +1,4 @@
-path:
+paths:
   /api/notifications/{id}:
     put:
       tags: [Notifications]
@@ -19,19 +19,25 @@ path:
                 is_read:
                   type: boolean
       responses:
-        204:
+        '204':
           description: Notification updated
-        400:
+        '400':
           description: Validation error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotificationValidationError'
+        '404':
+          description: Notification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationNotFoundError'
 
-  /api/notification/user/{userId}:
+  /api/notifications/user/{userId}:
     get:
       tags: [Notifications]
-      summary: Lists all the notification of a user
+      summary: Lists all notifications of a user
       parameters:
         - in: path
           name: userId
@@ -39,18 +45,42 @@ path:
           schema:
             type: integer
       responses:
-        200:
-          description: Found the notification
-        400:
+        '200':
+          description: Found the notifications
+        '400':
           description: Validation error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotificationValidationError'
-        404:
-          description: Not Found
+        '404':
+          description: Not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotificationNotFoundError'
-          
+  /api/notifications:
+    post:
+      tags: [Notifications]
+      summary: Creates a new notification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: integer
+                type:
+                  type: string
+                  enum: [INVITE, COMMENT, REACT, FOLLOW]
+      responses:
+        '201':
+          description: Notification created
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationValidationError'  

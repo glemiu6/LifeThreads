@@ -10,7 +10,7 @@ components:
           items:
             type: string
 
-    # 400 - validation errors
+    # ---- Thread Errors ----
     ThreadValidationError:
       allOf:
         - $ref: '#/components/schemas/ErrorResponse'
@@ -20,7 +20,6 @@ components:
               - "title: Minimum 3 characters"
               - "description: Required field"
 
-    # 403 - not the thread owner
     ThreadForbiddenError:
       allOf:
         - $ref: '#/components/schemas/ErrorResponse'
@@ -29,7 +28,6 @@ components:
             details:
               - "You are not the owner of this thread"
 
-    # 404 - thread not found
     ThreadNotFoundError:
       allOf:
         - $ref: '#/components/schemas/ErrorResponse'
@@ -38,7 +36,6 @@ components:
             details:
               - "Thread with id 42 does not exist"
 
-    # 409 - conflict (e.g. user already a member)
     ThreadConflictError:
       allOf:
         - $ref: '#/components/schemas/ErrorResponse'
@@ -46,21 +43,73 @@ components:
             error: "Conflict"
             details:
               - "User is already a member of this thread"
-    
 
+    # ---- Notification Errors ----
     NotificationValidationError:
       allOf:
         - $ref: '#/components/schemas/ErrorResponse'
         - example:
-          error: "Validation failed"
-          details:
-            - "is_read: must be a boolean"
+            error: "Validation failed"
+            details:
+              - "is_read: must be a boolean"
+
     NotificationNotFoundError:
       allOf:
         - $ref: '#/components/schemas/ErrorResponse'
-        - exemple:
-          error: "Users's Notification not found"
-          details:
-            - "User 42 doesn't have any notifications"
+        - example:
+            error: "Not found"
+            details:
+              - "User 42 doesn't have any notifications"
 
+    # ---- User Errors ----
+    UserValidationError:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - example:
+            error: "Validation failed"
+            details:
+              - "name: Minimum 2 characters"
+              - "email: Invalid email"
+              - "password: Minimum 4 characters"
+
+    UserNotFoundError:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - example:
+            error: "Not found"
+            details:
+              - "User with id 42 does not exist"
+
+    UserConflictError:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - example:
+            error: "Conflict"
+            details:
+              - "User is already being followed"
+
+    UserForbiddenError:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - example:
+            error: "Forbidden"
+            details:
+              - "You do not have permission to perform this action"
     
+
+    EntryValidationError:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - example:
+            error: "Validation failed"
+            details:
+              - "title: Required field"
+              - "body: Required field"
+
+    EntryNotFoundError:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - example:
+            error: "Not found"
+            details:
+              - "Entry with id 42 does not exist"

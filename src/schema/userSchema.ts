@@ -1,12 +1,12 @@
 import { z } from 'zod';
 
 export const updateUserSchema = z.object({
-  body: z.object({
+  
     name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres").optional(),
     email: z.email("Email inválido").optional(),
     bio: z.string().max(255, "A bio não pode exceder 255 caracteres").optional(),
-    avatar: z.string().url("URL do avatar inválido").optional(),
-  }),
+    avatar: z.string("URL do avatar inválido").optional(),
+  
 });
 
 export const searchUserSchema = z.object({
@@ -19,3 +19,5 @@ export const createUserSchema =z.object({
   password:z.string().min(4,"A password deve ter melo menos 4 caracteres"),
   avatar:z.string()
 })
+
+export const userIdSchema = z.number().int().positive("ID inválido");

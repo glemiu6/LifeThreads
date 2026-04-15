@@ -3,22 +3,12 @@ import * as NotificationController from "../controllers/notificationController.j
 
 const router = Router();
 
-/**
- * @swagger
- * /api/notifications/user/{userId}:
- * get:
- * summary: Lista notificações de um utilizador
- * tags: [Notifications]
- * parameters:
- * - in: path
- * name: userId
- * required: true
- * schema:
- * type: integer
- */
+
 router.get("/user/:userId", NotificationController.getByUser);
 
 
 router.put("/:id", NotificationController.updateStatus);
+
+router.post("/", NotificationController.createNotification);
 
 export default router;

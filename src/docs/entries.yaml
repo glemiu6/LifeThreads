@@ -1,0 +1,166 @@
+paths:
+  /api/threads/{id}/entries:
+    get:
+      tags: [Entries]
+      summary: List all entries of a thread
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of entries
+        '404':
+          description: Thread not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntryNotFoundError'
+    post:
+      tags: [Entries]
+      summary: Create a new entry in a thread
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                body:
+                  type: string
+                location:
+                  type: string
+      responses:
+        '201':
+          description: Entry created successfully
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntryValidationError'
+
+  /api/entries/{id}:
+    get:
+      tags: [Entries]
+      summary: Get entry details
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Entry details
+        '404':
+          description: Entry not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntryNotFoundError'
+    put:
+      tags: [Entries]
+      summary: Update an entry
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                body:
+                  type: string
+                location:
+                  type: string
+      responses:
+        '200':
+          description: Entry updated successfully
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntryValidationError'
+        '404':
+          description: Entry not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntryNotFoundError'
+    delete:
+      tags: [Entries]
+      summary: Delete an entry
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Entry deleted successfully
+        '404':
+          description: Entry not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntryNotFoundError'
+
+  /api/entries/{id}/publish:
+    put:
+      tags: [Entries]
+      summary: Publish an entry
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Entry published successfully
+        '404':
+          description: Entry not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntryNotFoundError'
+
+  /api/entries/{id}/unpublish:
+    put:
+      tags: [Entries]
+      summary: Unpublish an entry
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Entry unpublished successfully
+        '404':
+          description: Entry not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntryNotFoundError'

@@ -1,6 +1,6 @@
 import {type Request, type Response} from 'express';
 import * as NotificationService from "../services/notificationService.js";
-import { NotificationIdSchema, UpdateNotificationSchema } from "../schema/notificationSchema.js";
+import { NotificationIdSchema, UpdateNotificationSchema ,CreateNotificationSchema} from "../schema/notificationSchema.js";
 
 
   export const getByUser=async(req: Request, res: Response) =>{
@@ -29,3 +29,13 @@ import { NotificationIdSchema, UpdateNotificationSchema } from "../schema/notifi
     
   }
 
+  export const createNotification = async(req: Request, res: Response) => {
+    
+      const result  = CreateNotificationSchema.safeParse(req.body);
+      if (!result.success){
+        return res.status(400).json({error:result.error.issues.map((issue)=>`${issue.path}: ${issue.message}`)});
+      }
+      const created = await NotificationService.createNotification(result.data.userId,result.data.type);
+      res.status(201).json(created);
+    
+  }

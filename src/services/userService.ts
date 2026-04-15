@@ -8,18 +8,27 @@ export const createUser = async(name:string,email:string,password:string,bio:str
     return await prisma.users.create({data:{name,email,password,bio,avatar}})
 }
 
-export const getUserById = async (id:number) => {
+export const getUserById = async (id: number) => {
   return await prisma.users.findUnique({
     where: { id },
-    select: { id: true, name: true, email: true, avatar: true, bio: true}
+    select: { id: true, name: true, email: true, avatar: true, bio: true, createdAt: true }
   });
 };
 
-export const updateUserService = async (id: number, data: any) => {
+export const updateUserService = async (id: number, name:string,email:string,bio:string,avatar:string) => {
   return await prisma.users.update({
     where: { id },
-    data,
+    data:{
+      name: name,
+      email: email,
+      bio: bio,
+      avatar: avatar
+    }
   });
+};
+
+export const deleteUserService = async (id: number) => {
+  return await prisma.users.delete({ where: { id } });
 };
 
 export const searchUsersService = async (query: string) => {
@@ -34,10 +43,24 @@ export const searchUsersService = async (query: string) => {
   });
 };
 
+export const followUserService = async (followerId: number, followingId: number) => {
+  return await prisma.following.create({ data: { followerId, followingId } });
+};
 
-export const followUserService=async(followerId:number,followingId:number)=>{
-  return await prisma.following.create({
-    data:{followerId:followerId,followingId:followingId}
-  })
-}
+export const unfollowUserService = async (followerId: number, followingId: number) => {
+  return await prisma.following.delete({
+    where: { followerId_followingId: { followerId, followingId } }
+  });
+};
 
+export const getFollowingService = async (userId: number) => {
+  return await prisma.following.findMany({
+    where: { followerId: userId },
+  });
+};
+
+export const getFollowersService = async (userId: number) => {
+  return await prisma.following.findMany({
+    where: { followingId: userId }
+  });
+};
