@@ -1,9 +1,9 @@
 import { prisma } from "../lib/prisma.js";
 
 // Criar nova Entrada (associada a uma Thread)
-export const createEntry = async (threadId: number, title: string, body: string, entry_date: Date, location?: string) => {
+export const createEntry = async (threadId: number, title: string, body: string,  location: string) => {
     return await prisma.entry.create({
-        data: { threadId, title, body, entry_date, location, is_published: false }
+        data: { threadId, title, body, location, is_published: false }
     });
 };
 
@@ -24,10 +24,10 @@ export const findEntryById = async (id: number) => {
 };
 
 // Atualizar dados de uma Entrada
-export const updateEntryData = async (id: number, title: string, body: string, location?: string) => {
+export const updateEntryData = async (id: number, title: string, body: string, location: string) => {
     return await prisma.entry.update({
         where: { id },
-        data: { title, body, location }
+        data:{title,body,location}
     });
 };
 
