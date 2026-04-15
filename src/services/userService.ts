@@ -34,3 +34,10 @@ export const searchUsersService = async (query: string) => {
   });
 };
 
+
+export const followUserService=async(followerId:number,followingId:number)=>{
+  return await prisma.following.create({
+    data:{followerId:followerId,followingId:followingId}
+  })
+}
+
