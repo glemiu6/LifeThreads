@@ -5,9 +5,9 @@ const router = Router()
 
 router.get('/',userController.getUsers);
 router.post('/',userController.createUserController)
-router.get(':id/me', userController.getMe);
-router.put(':id/me', userController.updateMe);
 router.get('/search', userController.searchUsers);
+router.get('/:id/me', userController.getMe);
+router.put('/:id/me', userController.updateMe);
 router.post('/:id/follow', userController.followUser);
 
 export default router;

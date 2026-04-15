@@ -63,14 +63,14 @@ export const searchUsers = async (req: Request, res: Response) => {
   if(!result.success){
       return res.status(400).json({error:result.error.issues.map((issue)=>`${issue.path}: ${issue.message}`)});
   }
-  const search = userService.searchUsersService(result.data.query)
+  const search = await userService.searchUsersService(result.data.query)
   res.status(200).json(search)
 };
 
 export const followUser = async (req: Request, res: Response) => {
   try {
     const followerId= Number(req.params.id)
-    const following = req.body;
+    const following = req.body.followingId;
     const user = await userService.followUserService(followerId, following);
     res.status(204).json(user);
   } catch (error) {

@@ -6,20 +6,32 @@ POST http://localhost:3000/api/users
 Content-Type: application/json
 
 {
-    "name":"dana",
-    "email":"dana123@gmail.com",
-    "password":"dsds",
-    "bio":"dddada",
-    "avatar":"instagram.com/dana"
+    "name":"vlad",
+    "email":"vlad11@gmail.com",
+    "password":"1123",
+    "bio":"vladd",
+    "avatar":"filelocal"
 }
+###
+GET http://localhost:3000/api/users/1/me
 
+###
+GET http://localhost:3000/api/users/search?query=d
+
+###
+POST http://localhost:3000/api/users/1/follow
+Content-Type: application/json
+
+{
+    "followingId":2
+}
 
 ###
 POST http://localhost:3000/api/threads
 Content-Type: application/json
 
 {
-    "userId":1,
+    "userId":2,
     "title":"school thread",
     "description":"pascoa "
     
@@ -32,12 +44,12 @@ GET http://localhost:3000/api/threads
 GET http://localhost:3000/api/threads/2/users
 
 ###
-PUT http://localhost:3000/api/threads/4
+PUT http://localhost:3000/api/threads/2
 Content-Type: application/json
 
 {
-    "title": "pascoa thread",
-    "description": "thread para pascoa"
+    "title": "fcul thread",
+    "description": "thread para fcul"
 }
 
 ###
@@ -58,3 +70,16 @@ GET http://localhost:3000/api/threads/explore
 
 ###
 GET http://localhost:3000/api/threads/search?query=x
+
+###
+POST http://localhost:3000/api/threads/1/entries
+Content-Type: application/json
+
+{
+    "title":"School",
+    "body":"a entry for everythong about school",
+    "location":"Lisboa"
+}
+
+###
+GET http://localhost:3000/api/threads/1/entries
