@@ -15,13 +15,4 @@ entryRouter.post('/:id/unpublish', entriesController.unpublishEntry);
 
 // ======================================================= //
 
-// Router para /api/threads/:threadId/entries
-// Importante: No teu ficheiro de rotas das Threads ou no index.ts, tens de ligar isto da seguinte forma:
-// app.use('/api/threads/:threadId/entries', threadEntriesRouter);
-const threadEntriesRouter = Router({ mergeParams: true }); // mergeParams permite aceder ao :threadId
-
-threadEntriesRouter.get('/', entriesController.listEntriesByThread);
-threadEntriesRouter.post('/', entriesController.createEntry);
-
-
-export { entryRouter, threadEntriesRouter };
+export default  entryRouter ;
