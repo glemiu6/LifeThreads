@@ -13,9 +13,9 @@ router.get('/search', userController.searchUsers);
 router.get('/', userController.getUsers);
 
 // ---- me routes (temporary until auth is added) ----
-router.get('/:id/me', userController.getMe);
-router.put('/:id/me', userController.updateMe);
-router.delete('/:id/me', userController.deleteMe);
+router.get('/:id', userController.getMe);
+router.put('/:id', userController.updateMe);
+router.delete('/:id', userController.deleteMe);
 
 // ---- dynamic routes ----
 router.get('/:id/profile', userController.getPublicProfile);

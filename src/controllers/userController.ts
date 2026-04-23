@@ -21,11 +21,11 @@ export const createUserController = async (req: Request, res: Response) => {
 };
 
 export const getMe = async (req: Request, res: Response) => {
-    const result = userIdSchema.safeParse(Number(req.params.id));
+    const result = userIdSchema.safeParse(Number(req.params.id)); 
     if (!result.success) {
         return res.status(400).json({ error: result.error.issues.map((issue) => `${issue.path}: ${issue.message}`) });
     }
-    const user = await userService.getUserById(result.data);
+    const user = await userService.getUserById(result.data); 
     if (!user) return res.status(404).json({ error: "Utilizador não encontrado" });
     res.status(200).json(user);
 };
@@ -45,7 +45,7 @@ export const deleteMe = async (req: Request, res: Response) => {
     if (!result.success) {
         return res.status(400).json({ error: result.error.issues.map((issue) => `${issue.path}: ${issue.message}`) });
     }
-    await userService.deleteUserService(result.data);
+    await userService.deleteUserService(result.data); 
     res.status(204).send();
 };
 
@@ -95,7 +95,7 @@ export const getFollowing = async (req: Request, res: Response) => {
     if (!result.success) {
         return res.status(400).json({ error: result.error.issues.map((issue) => `${issue.path}: ${issue.message}`) });
     }
-    const list = await userService.getFollowingService(result.data);
+    const list = await userService.getFollowingService(result.data); 
     res.status(200).json(list);
 };
 
@@ -104,6 +104,6 @@ export const getFollowers = async (req: Request, res: Response) => {
     if (!result.success) {
         return res.status(400).json({ error: result.error.issues.map((issue) => `${issue.path}: ${issue.message}`) });
     }
-    const list = await userService.getFollowersService(result.data);
+    const list = await userService.getFollowersService(result.data); 
     res.status(200).json(list);
 };

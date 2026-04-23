@@ -68,7 +68,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserValidationError'
 
-  /api/users/{id}/me:
+  /api/users/{id}:
     get:
       tags: [Users]
       summary: Get current user info
