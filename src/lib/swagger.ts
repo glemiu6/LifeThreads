@@ -8,6 +8,16 @@ const options = {
             version:"1.0.0",
             description:"Documentação organizada por ficheiros YAML"
         },
+        components:{
+            securitySchema:{
+                bearerAuth:{
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
+                }
+            }
+
+        }
     },
     apis:['./src/docs/*.yaml']
 };

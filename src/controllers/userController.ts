@@ -1,6 +1,7 @@
 import { type Request, type Response } from "express";
 import * as userService from "../services/userService.js";
 import { createUserSchema, searchUserSchema, updateUserSchema,userIdSchema } from "../schema/userSchema.js";
+import { type AuthenticatedRequest } from '../middleware/authGuard.js';
 
 export const getUsers = async (req: Request, res: Response) => {
     try {
@@ -20,14 +21,27 @@ export const createUserController = async (req: Request, res: Response) => {
     res.status(201).json(user);
 };
 
-export const getMe = async (req: Request, res: Response) => {
-    const result = userIdSchema.safeParse(Number(req.params.id)); 
+export const getMe = async (req: AuthenticatedRequest, res: Response) => {
+    const result = userIdSchema.safeParse(req.params); 
     if (!result.success) {
         return res.status(400).json({ error: result.error.issues.map((issue) => `${issue.path}: ${issue.message}`) });
     }
-    const user = await userService.getUserById(result.data); 
-    if (!user) return res.status(404).json({ error: "Utilizador não encontrado" });
-    res.status(200).json(user);
+    if (!req.user) {
+        return res.status(401).json({ error: "Utilizador não autenticado." });
+    }
+    const requestedId=result.data.id;
+    if(req.user.id!==requestedId){
+        res.status(403).json({ error: "Acesso negado. Apenas pode consultar o seu próprio perfil." });
+    }
+    try{
+        const user = await userService.getUserById(requestedId); 
+        if (!user) return res.status(404).json({ error: "Utilizador não encontrado" });
+        const{password,...safeUser} = user;
+        res.status(200).json(safeUser);
+    }catch(error){
+        res.status(500).json({error:'Erro interno do servidor.'})
+    }
+    
 };
 
 export const updateMe = async (req: Request, res: Response) => {
@@ -41,20 +55,20 @@ export const updateMe = async (req: Request, res: Response) => {
 };
 
 export const deleteMe = async (req: Request, res: Response) => {
-    const result = userIdSchema.safeParse(Number(req.params.id));
+    const result = userIdSchema.safeParse(req.params);
     if (!result.success) {
         return res.status(400).json({ error: result.error.issues.map((issue) => `${issue.path}: ${issue.message}`) });
     }
-    await userService.deleteUserService(result.data); 
+    await userService.deleteUserService(result.data.id); 
     res.status(204).send();
 };
 
 export const getPublicProfile = async (req: Request, res: Response) => {
-    const result = userIdSchema.safeParse(Number(req.params.id));
+    const result = userIdSchema.safeParse((req.params));
     if (!result.success) {
         return res.status(400).json({ error: result.error.issues.map((issue) => `${issue.path}: ${issue.message}`) });
     }
-    const user = await userService.getUserById(result.data);
+    const user = await userService.getUserById(result.data.id);
     if (!user) return res.status(404).json({ error: "Utilizador não encontrado" });
     res.status(200).json(user);
 };
@@ -91,19 +105,19 @@ export const unfollowUser = async (req: Request, res: Response) => {
 };
 
 export const getFollowing = async (req: Request, res: Response) => {
-    const result = userIdSchema.safeParse(Number(req.params.id));
+    const result = userIdSchema.safeParse((req.params));
     if (!result.success) {
         return res.status(400).json({ error: result.error.issues.map((issue) => `${issue.path}: ${issue.message}`) });
     }
-    const list = await userService.getFollowingService(result.data); 
+    const list = await userService.getFollowingService(result.data.id); 
     res.status(200).json(list);
 };
 
 export const getFollowers = async (req: Request, res: Response) => {
-    const result = userIdSchema.safeParse(Number(req.params.id));
+    const result = userIdSchema.safeParse((req.params));
     if (!result.success) {
         return res.status(400).json({ error: result.error.issues.map((issue) => `${issue.path}: ${issue.message}`) });
     }
-    const list = await userService.getFollowersService(result.data); 
+    const list = await userService.getFollowersService(result.data.id); 
     res.status(200).json(list);
 };

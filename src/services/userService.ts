@@ -1,11 +1,13 @@
 import {prisma} from "../lib/prisma.js";
+import bcrypt from 'bcryptjs';
 
 export const findAllUsers = async()=>{
     return await prisma.users.findMany();
 }
 
 export const createUser = async(name:string,email:string,password:string,bio:string,avatar:string)=>{
-    return await prisma.users.create({data:{name,email,password,bio,avatar}})
+    const hashedPassword = await bcrypt.hash(password, 10);
+    return await prisma.users.create({data:{name,email,password:hashedPassword,bio,avatar}})
 }
 
 export const getUserById = async (id: number) => {
@@ -62,4 +64,10 @@ export const getFollowersService = async (userId: number) => {
   return await prisma.following.findMany({
     where: { followingId: userId }
   });
+};
+
+export const findUserByEmail = async(email:string)=>{
+  return await prisma.users.findUnique({
+    where:{email}
+  })
 };

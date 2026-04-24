@@ -2,16 +2,25 @@ GET http://localhost:3000/api/users
 
 
 ###
-POST http://localhost:3000/api/users
+POST http://localhost:3000/api/users/auth/register
 Content-Type: application/json
 
 {
-    "name":"vlad",
-    "email":"vlad11@gmail.com",
-    "password":"1123",
-    "bio":"vladd",
+    "name":"vasea",
+    "email":"vasea@gmail.com",
+    "password":"Vasea12)@",
+    "bio":"vasea",
     "avatar":"filelocal"
 }
+###
+GET http://localhost:3000/api/users/auth/login
+Content-Type: application/json
+
+{
+    "email":"vasea@gmail.com",
+    "password":"$2b$10$cmXl8oKFiYzMdOHWglbWpuxkhEJkSWZMZFl/xPVlJ/4d65EgRm6nS"
+}
+
 ###
 GET http://localhost:3000/api/users/3
 

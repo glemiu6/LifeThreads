@@ -1,10 +1,12 @@
 import { Router } from "express";
 import * as userController from '../controllers/userController.js'
+import {authGuard} from '../middleware/authGuard.js'
 
 const router = Router()
 
 // ---- auth routes ----
 router.post('/auth/register', userController.createUserController);
+router.get('/auth/login',userController.login);
 
 // ---- static routes ----
 router.get('/search', userController.searchUsers);
@@ -13,7 +15,7 @@ router.get('/search', userController.searchUsers);
 router.get('/', userController.getUsers);
 
 // ---- me routes (temporary until auth is added) ----
-router.get('/:id', userController.getMe);
+router.get('/:id', authGuard ,userController.getMe);
 router.put('/:id', userController.updateMe);
 router.delete('/:id', userController.deleteMe);
 
