@@ -8,7 +8,7 @@ user?: { id: number; role?: string };
 }
 
 export const authGuard =(req:AuthenticatedRequest,res:Response,next:NextFunction)=>{
-    const token = req.headers.authorization?.split("")[1];
+    const token = req.headers.authorization?.split(" ")[1];
     if(!token){
         res.status(404).json({error:'Acesso negado. Token em falta.'})
         return
