@@ -274,3 +274,36 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserNotFoundError'
+  
+  /api/users/auth/login:
+    post:
+      tags: [Users]
+      summary: Login a user
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: User logged in successfully
+        '400':
+          description: Validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserUnauthorizedError'
