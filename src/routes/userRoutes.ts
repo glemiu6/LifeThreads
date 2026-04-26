@@ -1,12 +1,12 @@
 import { Router } from "express";
 import * as userController from '../controllers/userController.js'
 import {authGuard} from '../middleware/authGuard.js'
-
+import * as AuthController from '../controllers/authController.js'
 const router = Router()
 
 // ---- auth routes ----
 router.post('/auth/register', userController.createUserController);
-router.get('/auth/login',userController.login);
+router.post('/auth/login', AuthController.login);
 
 // ---- static routes ----
 router.get('/search', userController.searchUsers);
