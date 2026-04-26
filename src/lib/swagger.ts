@@ -9,7 +9,7 @@ const options = {
             description:"Documentação organizada por ficheiros YAML"
         },
         components:{
-            securitySchema:{
+            securitySchemes:{
                 bearerAuth:{
                     type: 'http',
                     scheme: 'bearer',
