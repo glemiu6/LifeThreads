@@ -19,3 +19,20 @@ export const updateVisibilityThreadSchema = z.object({
 export const searchQuerySchema = z.object({
     q: z.string().trim().min(1,'Query cannot be empty')
 })
+
+export const inviteSchema = z.object({
+  email: z.string().email('Invalid email'),
+  expires_at: z.coerce.date().refine(
+    (date) => date > new Date(),
+    'Expiry date must be in the future'
+  )
+});
+
+export const updateMembershipRoleSchema = z.object({
+    role: z.enum(['ADMIN', 'COLLABORATOR', 'OBSERVER'])
+})
+
+export const updatedInviteStatusSchema = z.object({
+    id: z.coerce.number().int().positive(),
+    response: z.enum(['ACCEPTED', 'DECLINE'])
+})
