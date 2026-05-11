@@ -1,6 +1,6 @@
 import { type Request, type Response } from "express";
 import * as userService from "../services/userService.js";
-import { createUserSchema, searchUserSchema, updateUserSchema,userIdSchema } from "../schema/userSchema.js";
+import { createUserSchema, searchUserSchema, updateUserSchema, userIdSchema } from "../schema/userSchema.js";
 import { type AuthenticatedRequest } from '../middleware/authGuard.js';
 
 export const getUsers = async (req: Request, res: Response) => {
@@ -29,8 +29,8 @@ export const getMe = async (req: AuthenticatedRequest, res: Response) => {
     if (!req.user) {
         return res.status(401).json({ error: "Utilizador não autenticado." });
     }
-    const requestedId=result.data.id;
-    if(req.user.id!==requestedId){
+    const requestedId = result.data.id;
+    if(req.user.id !== requestedId){
         res.status(403).json({ error: "Acesso negado. Apenas pode consultar o seu próprio perfil." });
     }
     try{
@@ -41,11 +41,15 @@ export const getMe = async (req: AuthenticatedRequest, res: Response) => {
     }catch(error){
         res.status(500).json({error:'Erro interno do servidor.'})
     }
-    
 };
 
-export const updateMe = async (req: Request, res: Response) => {
+export const updateMe = async (req: AuthenticatedRequest, res: Response) => {
     const idUser = Number(req.params.id);
+    
+    if (!req.user || req.user.id !== idUser) {
+        return res.status(403).json({ error: "Acesso negado. Apenas pode alterar o seu próprio perfil." });
+    }
+
     const result = updateUserSchema.safeParse(req.body);
     if (!result.success) {
         return res.status(400).json({ error: result.error.issues.map((issue) => `${issue.path}: ${issue.message}`) });
@@ -54,12 +58,19 @@ export const updateMe = async (req: Request, res: Response) => {
     res.status(200).json(updated);
 };
 
-export const deleteMe = async (req: Request, res: Response) => {
+export const deleteMe = async (req: AuthenticatedRequest, res: Response) => {
     const result = userIdSchema.safeParse(req.params);
     if (!result.success) {
         return res.status(400).json({ error: result.error.issues.map((issue) => `${issue.path}: ${issue.message}`) });
     }
-    await userService.deleteUserService(result.data.id); 
+    
+    const idUser = result.data.id;
+
+    if (!req.user || req.user.id !== idUser) {
+        return res.status(403).json({ error: "Acesso negado. Apenas pode apagar o seu próprio perfil." });
+    }
+
+    await userService.deleteUserService(idUser); 
     res.status(204).send();
 };
 
@@ -82,9 +93,16 @@ export const searchUsers = async (req: Request, res: Response) => {
     res.status(200).json(results);
 };
 
-export const followUser = async (req: Request, res: Response) => {
-    const followerId = Number(req.params.id);
-    const { followingId } = req.body;
+export const followUser = async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.user) return res.status(401).json({ error: "Não autenticado" });
+    
+    const followerId = req.user.id;
+    const followingId = Number(req.params.id);
+
+    if (followerId === followingId) {
+        return res.status(400).json({ error: "Não pode seguir-se a si próprio." });
+    }
+
     try {
         const follow = await userService.followUserService(followerId, followingId);
         res.status(201).json(follow);
@@ -93,9 +111,12 @@ export const followUser = async (req: Request, res: Response) => {
     }
 };
 
-export const unfollowUser = async (req: Request, res: Response) => {
-    const followerId = Number(req.params.id);
-    const { followingId } = req.body;
+export const unfollowUser = async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.user) return res.status(401).json({ error: "Não autenticado" });
+    
+    const followerId = req.user.id;
+    const followingId = Number(req.params.id);
+
     try {
         await userService.unfollowUserService(followerId, followingId);
         res.status(204).send();
