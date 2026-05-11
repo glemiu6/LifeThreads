@@ -1,29 +1,25 @@
 import { Router } from "express";
 import * as userController from '../controllers/userController.js'
-import {authGuard} from '../middleware/authGuard.js'
+import { authGuard } from '../middleware/authGuard.js'
 import * as AuthController from '../controllers/authController.js'
-const router = Router()
 
-// ---- auth routes ----
+const router = Router();
+
 router.post('/auth/register', userController.createUserController);
 router.post('/auth/login', AuthController.login);
 
-// ---- static routes ----
 router.get('/search', userController.searchUsers);
-
-// ---- collection routes ----
-router.get('/', userController.getUsers);
-
-// ---- me routes (temporary until auth is added) ----
-router.get('/:id', authGuard ,userController.getMe);
-router.put('/:id', userController.updateMe);
-router.delete('/:id', userController.deleteMe);
-
-// ---- dynamic routes ----
 router.get('/:id/profile', userController.getPublicProfile);
-router.get('/:id/following', userController.getFollowing);
-router.get('/:id/followers', userController.getFollowers);
-router.post('/:id/follow', userController.followUser);
-router.delete('/:id/follow', userController.unfollowUser);
+
+router.get('/', authGuard, userController.getUsers);
+
+router.get('/:id', authGuard, userController.getMe);
+router.put('/:id', authGuard, userController.updateMe);       
+router.delete('/:id', authGuard, userController.deleteMe);    
+
+router.get('/:id/following', authGuard, userController.getFollowing);
+router.get('/:id/followers', authGuard, userController.getFollowers);
+router.post('/:id/follow', authGuard, userController.followUser);
+router.delete('/:id/follow', authGuard, userController.unfollowUser);
 
 export default router;
