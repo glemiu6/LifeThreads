@@ -1,5 +1,5 @@
-function Entries() {
-    return <div className="p-8 text-xl font-semibold">Entries</div>
-}
+import {useState} from "react";
+import {useNavigate,Link} from "react-router-dom";
+import axios from "axios";
 
-export default Entries;
+export default function Entries() {};
