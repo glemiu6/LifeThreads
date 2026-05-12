@@ -1,6 +1,8 @@
 import { type Request, type Response } from 'express';
 import * as entriesService from '../services/entriesService.js';
 import { createEntrySchema, entryIdSchema, updateEntrySchema } from '../schema/entriesSchema.js';
+import { type AuthenticatedRequest } from '../middleware/authGuard.js';
+
 
 export const createEntry = async (req: Request, res: Response) => {
     const threadId = Number(req.params.id);

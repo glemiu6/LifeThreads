@@ -1,6 +1,8 @@
 import {type Request, type Response} from 'express';
 import * as NotificationService from "../services/notificationService.js";
 import { NotificationIdSchema, UpdateNotificationSchema ,CreateNotificationSchema} from "../schema/notificationSchema.js";
+import {type AuthenticatedRequest} from '../middleware/authGuard.js';
+
 
 
   export const getByUser=async(req: Request, res: Response) =>{
@@ -9,7 +11,7 @@ import { NotificationIdSchema, UpdateNotificationSchema ,CreateNotificationSchem
       if(!result.success){
 
       }
-      const data = await NotificationService.getAllByUser(Number(req.params.id));
+      const data = await NotificationService.getAllByUser(Number(req.params.userId));
       res.status(200).json(data);
     
   }
@@ -38,4 +40,15 @@ import { NotificationIdSchema, UpdateNotificationSchema ,CreateNotificationSchem
       const created = await NotificationService.createNotification(result.data.userId,result.data.type);
       res.status(201).json(created);
     
+  }
+
+  export const markAllRead = async (req: Request, res: Response) => {
+    await NotificationService.markAllRead(Number(req.params.id));
+    res.status(204).send();
+  }
+
+  export const deleteNotification = async (req: Request, res: Response) => {
+    const id= Number(req.params.id);
+    await NotificationService.deleteNotification(id);
+    res.status(204).send();
   }

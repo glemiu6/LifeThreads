@@ -25,3 +25,16 @@ export const createNotification = async(userId:number,type:Reaction)=>{
     }
   })
 }
+
+export const markAllRead = async(userId:number)=>{
+  return await prisma.notification.updateMany({
+    where:{userId,is_read:false},
+    data:{is_read:true}
+  })
+}
+
+export const deleteNotification = async (id:number)=>{
+  return await prisma.notification.delete({
+    where:{id}
+  })
+}
