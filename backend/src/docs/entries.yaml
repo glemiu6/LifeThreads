@@ -1,59 +1,87 @@
 paths:
-  /api/threads/{id}/entries:
-    get:
-      tags: [Entries]
-      summary: List all entries of a thread
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: List of entries
-        '404':
-          description: Thread not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EntryNotFoundError'
+  /api/entries/search:
     post:
-      tags: [Entries]
-      summary: Create a new entry in a thread
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
+      tags: [Entries, AI]
+      summary: Semantic search across entries using natural language
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required: [q]
               properties:
-                title:
+                q:
                   type: string
-                body:
-                  type: string
-                location:
-                  type: string
+                  example: happy moments with family
+                threadId:
+                  type: integer
+                  example: 3
+                limit:
+                  type: integer
+                  minimum: 1
+                  maximum: 50
+                  example: 10
+                onlyPublished:
+                  type: boolean
+                  example: false
       responses:
-        '201':
-          description: Entry created successfully
-        '400':
-          description: Validation error
+        200:
+          description: Semantically ranked entries
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EntryValidationError'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Entry'
+        503:
+          description: LLM unavailable
+
+  /api/entries/draft:
+    post:
+      tags: [Entries, AI]
+      summary: Generate a journal entry draft using AI
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [prompt]
+              properties:
+                prompt:
+                  type: string
+                  example: sunset walk by the river
+                mood:
+                  type: string
+                  example: peaceful and reflective
+      responses:
+        200:
+          description: Generated draft
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    example: A Quiet Evening by the River
+                  body:
+                    type: string
+                    example: The sun was setting slowly as I made my way...
+        503:
+          description: LLM unavailable
 
   /api/entries/{id}:
     get:
       tags: [Entries]
       summary: Get entry details
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -61,17 +89,20 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
-          description: Entry details
-        '404':
-          description: Entry not found
+        200:
+          description: Entry with media and comments
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EntryNotFoundError'
+                $ref: '#/components/schemas/Entry'
+        404:
+          description: Entry not found
+
     put:
       tags: [Entries]
-      summary: Update an entry
+      summary: Update entry content
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -79,7 +110,6 @@ paths:
           schema:
             type: integer
       requestBody:
-        required: true
         content:
           application/json:
             schema:
@@ -92,23 +122,16 @@ paths:
                 location:
                   type: string
       responses:
-        '200':
-          description: Entry updated successfully
-        '400':
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EntryValidationError'
-        '404':
+        200:
+          description: Updated entry
+        404:
           description: Entry not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EntryNotFoundError'
+
     delete:
       tags: [Entries]
-      summary: Delete an entry
+      summary: Delete entry and all related data
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -116,39 +139,42 @@ paths:
           schema:
             type: integer
       responses:
-        '204':
-          description: Entry deleted successfully
-        '404':
-          description: Entry not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EntryNotFoundError'
+        204:
+          description: Entry deleted
 
-  /api/entries/{id}/publish:
+  /api/entries/{id}/status:
     put:
       tags: [Entries]
-      summary: Publish an entry
+      summary: Publish or unpublish an entry
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [is_published]
+              properties:
+                is_published:
+                  type: boolean
+                  example: true
       responses:
-        '200':
-          description: Entry published successfully
-        '404':
-          description: Entry not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EntryNotFoundError'
+        200:
+          description: Updated entry status
 
-  /api/entries/{id}/unpublish:
-    put:
-      tags: [Entries]
-      summary: Unpublish an entry
+  /api/entries/{id}/tags:
+    post:
+      tags: [Entries, AI]
+      summary: Auto-tag an entry using AI
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -156,11 +182,183 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
-          description: Entry unpublished successfully
-        '404':
-          description: Entry not found
+        200:
+          description: Generated and saved tags
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EntryNotFoundError'
+                type: object
+                properties:
+                  tags:
+                    type: array
+                    items:
+                      type: string
+                    example: [family, travel, happiness]
+        404:
+          description: Entry not found
+        503:
+          description: LLM unavailable
+
+  /api/entries/{id}/media:
+    post:
+      tags: [Entries]
+      summary: Add media to an entry
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [url, type]
+              properties:
+                url:
+                  type: string
+                  example: https://example.com/photo.jpg
+                type:
+                  type: string
+                  enum: [image, video, document]
+      responses:
+        201:
+          description: Media added
+
+  /api/entries/{id}/media/{mediaId}:
+    delete:
+      tags: [Entries]
+      summary: Remove media from an entry
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: mediaId
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Media removed
+
+  /api/entries/{id}/comments:
+    get:
+      tags: [Entries]
+      summary: Get comments on an entry
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: List of comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+
+    post:
+      tags: [Entries]
+      summary: Add a comment to an entry
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [body]
+              properties:
+                body:
+                  type: string
+                  example: Great memory!
+      responses:
+        201:
+          description: Comment created
+
+  /api/entries/{id}/comments/{commentId}:
+    delete:
+      tags: [Entries]
+      summary: Delete a comment (author only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: commentId
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Comment deleted
+        403:
+          description: Not your comment
+
+  /api/entries/{id}/reactions:
+    post:
+      tags: [Entries]
+      summary: React to an entry
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [type]
+              properties:
+                type:
+                  type: string
+                  enum: [LIKE, HEART, DISLIKE, SHOCK]
+      responses:
+        201:
+          description: Reaction saved
+
+    delete:
+      tags: [Entries]
+      summary: Remove reaction from an entry
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Reaction removed

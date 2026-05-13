@@ -1,309 +1,267 @@
 paths:
-  /api/users:
-    get:
-      tags: [Users]
-      summary: Get all users
-      responses:
-        '200':
-          description: List of users
-        '404':
-          description: No users found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserNotFoundError'
-
-  /api/users/search:
-    get:
-      tags: [Users]
-      summary: Search users by keywords
-      parameters:
-        - in: query
-          name: q
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: List of matching users
-        '400':
-          description: Validation errors
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserValidationError'
-        '404':
-          description: No users found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserNotFoundError'
-
   /api/users/auth/register:
-    post:
-      tags: [Users]
-      summary: Register a new user
-      requestBody:
-        required: true
+  post:
+    tags: [Auth]
+    summary: Register a new user
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [name, email, password, avatar]
+            properties:
+              name:
+                type: string
+                minLength: 2
+                example: João Silva
+              email:
+                type: string
+                format: email
+                example: joao@gmail.com
+              password:
+                type: string
+                example: Segura1!
+              avatar:
+                type: string
+                example: https://example.com/avatar.png
+    responses:
+      201:
+        description: User created successfully
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      400:
+        description: Validation error
+      409:
+        description: Email already registered
+
+/api/users/auth/login:
+  post:
+    tags: [Auth]
+    summary: Login and get JWT token
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [email, password]
+            properties:
+              email:
+                type: string
+                example: joao@gmail.com
+              password:
+                type: string
+                example: Segura1!
+    responses:
+      200:
+        description: Login successful
         content:
           application/json:
             schema:
               type: object
               properties:
-                name:
+                token:
                   type: string
-                email:
-                  type: string
-                password:
-                  type: string
-                avatar:
-                  type: string
-      responses:
-        '201':
-          description: User registered successfully
-        '400':
-          description: Validation errors
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserValidationError'
+                  example: eyJhbGciOiJIUzI1NiJ9...
+      401:
+        description: Invalid credentials
 
-  /api/users/{id}:
-    get:
-      tags: [Users]
-      summary: Get current user info
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Current user info
-        '404':
-          description: User not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserNotFoundError'
-    put:
-      tags: [Users]
-      summary: Update current user info
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
+/api/users:
+  get:
+    tags: [Users]
+    summary: List all users
+    security:
+      - bearerAuth: []
+    responses:
+      200:
+        description: List of users
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                email:
-                  type: string
-                bio:
-                  type: string
-                avatar:
-                  type: string
-      responses:
-        '200':
-          description: User updated successfully
-        '400':
-          description: Validation errors
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserValidationError'
-        '404':
-          description: User not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserNotFoundError'
-    delete:
-      tags: [Users]
-      summary: Delete user account
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-      responses:
-        '204':
-          description: User deleted successfully
-        '403':
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserForbiddenError'
-        '404':
-          description: User not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserNotFoundError'
+              type: array
+              items:
+                $ref: '#/components/schemas/User'
 
-  
-
-  /api/users/{id}/profile:
-    get:
-      tags: [Users]
-      summary: Get public profile of a user
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Public profile
-        '404':
-          description: User not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserNotFoundError'
-
-  /api/users/{id}/following:
-    get:
-      tags: [Users]
-      summary: Get list of users this user is following
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: List of following
-        '404':
-          description: User not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserNotFoundError'
-
-  /api/users/{id}/followers:
-    get:
-      tags: [Users]
-      summary: Get list of followers
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: List of followers
-        '404':
-          description: User not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserNotFoundError'
-
-  /api/users/{id}/follow:
-    post:
-      tags: [Users]
-      summary: Follow a user
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-      requestBody:
+/api/users/search:
+  get:
+    tags: [Users]
+    summary: Search users by name or email
+    parameters:
+      - in: query
+        name: query
         required: true
+        schema:
+          type: string
+          example: joão
+    responses:
+      200:
+        description: Search results
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                followingId:
-                  type: integer
-      responses:
-        '201':
-          description: User followed successfully
-        '404':
-          description: User not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserNotFoundError'
-        '409':
-          description: Already following
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserConflictError'
-    delete:
-      tags: [Users]
-      summary: Unfollow a user
-      parameters:
-        - in: path
-          name: id
-          required: true
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  avatar:
+                    type: string
+
+/api/users/{id}:
+  get:
+    tags: [Users]
+    summary: Get own profile
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    responses:
+      200:
+        description: User profile without password
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      403:
+        description: Access denied
+      404:
+        description: User not found
+
+  put:
+    tags: [Users]
+    summary: Update own profile
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      content:
+        application/json:
           schema:
-            type: integer
-      requestBody:
+            type: object
+            properties:
+              name:
+                type: string
+              email:
+                type: string
+              bio:
+                type: string
+              avatar:
+                type: string
+    responses:
+      200:
+        description: Updated user
+      403:
+        description: Access denied
+
+  delete:
+    tags: [Users]
+    summary: Delete own account
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
         required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                followingId:
-                  type: integer
-      responses:
-        '204':
-          description: Unfollowed successfully
-        '404':
-          description: User not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserNotFoundError'
-  
-  /api/users/auth/login:
-    post:
-      tags: [Users]
-      summary: Login a user
-      security:
-        - bearerAuth: []
-      requestBody:
+        schema:
+          type: integer
+    responses:
+      204:
+        description: Account deleted
+      403:
+        description: Access denied
+
+/api/users/{id}/profile:
+  get:
+    tags: [Users]
+    summary: Get public profile of any user
+    parameters:
+      - in: path
+        name: id
         required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                password:
-                  type: string
-      responses:
-        '200':
-          description: User logged in successfully
-        '400':
-          description: Validation errors
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserValidationError'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserUnauthorizedError'
+        schema:
+          type: integer
+    responses:
+      200:
+        description: Public profile
+      404:
+        description: User not found
+
+/api/users/{id}/follow:
+  post:
+    tags: [Users]
+    summary: Follow a user
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    responses:
+      201:
+        description: Now following
+      400:
+        description: Cannot follow yourself
+
+  delete:
+    tags: [Users]
+    summary: Unfollow a user
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    responses:
+      204:
+        description: Unfollowed
+
+/api/users/{id}/following:
+  get:
+    tags: [Users]
+    summary: Get list of users this user follows
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    responses:
+      200:
+        description: Following list
+
+/api/users/{id}/followers:
+  get:
+    tags: [Users]
+    summary: Get list of followers
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    responses:
+      200:
+        description: Followers list

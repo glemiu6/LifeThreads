@@ -1,115 +1,132 @@
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
-    ErrorResponse:
+    User:
       type: object
       properties:
-        error:
+        id:
+          type: integer
+        name:
           type: string
-        details:
+        email:
+          type: string
+        bio:
+          type: string
+          nullable: true
+        avatar:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    Thread:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        visibility:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    Entry:
+      type: object
+      properties:
+        id:
+          type: integer
+        threadId:
+          type: integer
+        title:
+          type: string
+        body:
+          type: string
+        entry_date:
+          type: string
+          format: date-time
+        location:
+          type: string
+          nullable: true
+        is_published:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        tags:
           type: array
           items:
-            type: string
+            type: object
+            properties:
+              tag:
+                type: object
+                properties:
+                  name:
+                    type: string
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
 
-    # ---- Thread Errors ----
-    ThreadValidationError:
-      allOf:
-        - $ref: '#/components/schemas/ErrorResponse'
-        - example:
-            error: "Validation failed"
-            details:
-              - "title: Minimum 3 characters"
-              - "description: Required field"
+    Media:
+      type: object
+      properties:
+        id:
+          type: integer
+        entryId:
+          type: integer
+        url:
+          type: string
+        type:
+          type: string
 
-    ThreadForbiddenError:
-      allOf:
-        - $ref: '#/components/schemas/ErrorResponse'
-        - example:
-            error: "Forbidden"
-            details:
-              - "You are not the owner of this thread"
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        entryId:
+          type: integer
+        body:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        author:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            avatar:
+              type: string
 
-    ThreadNotFoundError:
-      allOf:
-        - $ref: '#/components/schemas/ErrorResponse'
-        - example:
-            error: "Not found"
-            details:
-              - "Thread with id 42 does not exist"
-
-    ThreadConflictError:
-      allOf:
-        - $ref: '#/components/schemas/ErrorResponse'
-        - example:
-            error: "Conflict"
-            details:
-              - "User is already a member of this thread"
-
-    # ---- Notification Errors ----
-    NotificationValidationError:
-      allOf:
-        - $ref: '#/components/schemas/ErrorResponse'
-        - example:
-            error: "Validation failed"
-            details:
-              - "is_read: must be a boolean"
-
-    NotificationNotFoundError:
-      allOf:
-        - $ref: '#/components/schemas/ErrorResponse'
-        - example:
-            error: "Not found"
-            details:
-              - "User 42 doesn't have any notifications"
-
-    # ---- User Errors ----
-    UserValidationError:
-      allOf:
-        - $ref: '#/components/schemas/ErrorResponse'
-        - example:
-            error: "Validation failed"
-            details:
-              - "name: Minimum 2 characters"
-              - "email: Invalid email"
-              - "password: Minimum 4 characters"
-
-    UserNotFoundError:
-      allOf:
-        - $ref: '#/components/schemas/ErrorResponse'
-        - example:
-            error: "Not found"
-            details:
-              - "User with id 42 does not exist"
-
-    UserConflictError:
-      allOf:
-        - $ref: '#/components/schemas/ErrorResponse'
-        - example:
-            error: "Conflict"
-            details:
-              - "User is already being followed"
-
-    UserForbiddenError:
-      allOf:
-        - $ref: '#/components/schemas/ErrorResponse'
-        - example:
-            error: "Forbidden"
-            details:
-              - "You do not have permission to perform this action"
-    
-
-    EntryValidationError:
-      allOf:
-        - $ref: '#/components/schemas/ErrorResponse'
-        - example:
-            error: "Validation failed"
-            details:
-              - "title: Required field"
-              - "body: Required field"
-
-    EntryNotFoundError:
-      allOf:
-        - $ref: '#/components/schemas/ErrorResponse'
-        - example:
-            error: "Not found"
-            details:
-              - "Entry with id 42 does not exist"
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        type:
+          type: string
+          enum: [INVITE, COMMENT, REACT, FOLLOW]
+        is_read:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
