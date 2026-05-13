@@ -54,7 +54,7 @@ export const deleteEntry = async (req: Request, res: Response) => {
   res.status(204).send();
 };
 
-// ── Entry status (replaces publishEntry + unpublishEntry) ─────────────────────
+// ── Entry status  ─────────────────────
 
 export const updateStatus = async (req: Request, res: Response) => {
   const idResult = entryIdSchema.safeParse(Number(req.params.id));
