@@ -1,21 +1,23 @@
 import { prisma } from "../lib/prisma.js";
 
-// Criar nova Entrada (associada a uma Thread)
 export const createEntry = async (threadId: number, title: string, body: string,  location: string) => {
     return await prisma.entry.create({
         data: { threadId, title, body, location, is_published: false }
     });
 };
 
-// Listar todas as Entradas de uma Thread (com suporte futuro para filtros referidos no PDF)
 export const getEntriesByThread = async (threadId: number) => {
-    return await prisma.entry.findMany({
-        where: { threadId },
-        orderBy: { entry_date: 'desc' }
-    });
+  return await prisma.entry.findMany({
+    where: { threadId },
+    orderBy: { entry_date: 'desc' },
+    include: {
+      tags: { include: { tag: true } },
+      media: true,
+      comments: true
+    }
+  });
 };
 
-// Obter detalhes de uma Entrada específica
 export const findEntryById = async (id: number) => {
     return await prisma.entry.findUnique({
         where: { id },
@@ -23,7 +25,6 @@ export const findEntryById = async (id: number) => {
     });
 };
 
-// Atualizar dados de uma Entrada
 export const updateEntryData = async (id: number, title: string, body: string, location: string) => {
     return await prisma.entry.update({
         where: { id },
@@ -31,14 +32,15 @@ export const updateEntryData = async (id: number, title: string, body: string, l
     });
 };
 
-// Eliminar Entrada
 export const deleteEntry = async (id: number) => {
-    return await prisma.entry.delete({
-        where: { id }
-    });
+  await prisma.entryTag.deleteMany({ where: { entryId: id } });
+  await prisma.entryReaction.deleteMany({ where: { entryId: id } });
+  await prisma.comment.deleteMany({ where: { entryId: id } });
+  await prisma.media.deleteMany({ where: { entryId: id } });
+
+  return await prisma.entry.delete({ where: { id } });
 };
 
-// Publicar / Despublicar Entrada
 export const updateEntryPublishStatus = async (id: number, is_published: boolean) => {
     return await prisma.entry.update({
         where: { id },

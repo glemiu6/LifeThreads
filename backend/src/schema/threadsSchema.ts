@@ -36,3 +36,8 @@ export const updatedInviteStatusSchema = z.object({
     id: z.coerce.number().int().positive(),
     response: z.enum(['ACCEPTED', 'DECLINE'])
 })
+
+export const monthlySummarySchema = z.object({
+  year: z.coerce.number().int().min(2000).max(2100),
+  month: z.coerce.number().int().min(1).max(12)
+});

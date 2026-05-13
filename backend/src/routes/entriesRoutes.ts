@@ -1,32 +1,38 @@
 import { Router } from 'express';
 import * as entriesController from '../controllers/entriesController.js';
-import * as commentController from '../controllers/commentController.js';
-import * as reactionController from '../controllers/reactionController.js';
-import * as mediaController from '../controllers/mediaController.js';
 import { authGuard } from '../middleware/authGuard.js';
+import * as mediaController from '../controllers/mediaController.js';
+import * as commentsController from '../controllers/commentController.js'
+import * as reactionsController from '../controllers/reactionController.js'
 
 const entryRouter = Router();
 
-// ---- single entry routes ----
-entryRouter.get('/:id', entriesController.getEntryById);
-entryRouter.put('/:id', entriesController.updateEntryInfo);
-entryRouter.delete('/:id', entriesController.deleteEntry);
+// ── AI static routes (MUST be before /:id) ────────────────────────────────────
+entryRouter.post('/search',               authGuard, entriesController.searchEntries);
+entryRouter.post('/draft',                authGuard, entriesController.generateEntryDraft);
 
-// ---- entry status routes ----
-entryRouter.put('/:id/publish', entriesController.publishEntry);
-entryRouter.put('/:id/unpublish', entriesController.unpublishEntry);
+// ── Single entry CRUD ─────────────────────────────────────────────────────────
+entryRouter.get('/:id',                   authGuard, entriesController.getEntryById);
+entryRouter.put('/:id',                   authGuard, entriesController.updateEntryInfo);
+entryRouter.delete('/:id',               authGuard, entriesController.deleteEntry);
 
-// ---- reaction routes ----
-entryRouter.post('/:id/react',authGuard, reactionController.reactToEntry);
-entryRouter.delete('/:id/react',authGuard, reactionController.removeReaction);
+// ── Entry status ──────────────────────────────────────────────────────────────
+entryRouter.put('/:id/status',            authGuard, entriesController.updateStatus);
 
-// ---- media routes ----
-entryRouter.post('/:id/media', authGuard, mediaController.addMedia);
-// ---- comment routes ----
-entryRouter.get('/:id/comments', authGuard,commentController.getComment);
-entryRouter.post('/:id/comments', authGuard,commentController.createComment);
-entryRouter.delete('/comments/:id', authGuard,commentController.deleteComment);
+// ── Tags (AI) ─────────────────────────────────────────────────────────────────
+entryRouter.post('/:id/tags',             authGuard, entriesController.tagEntry);
 
-
+// ── Media ─────────────────────────────────────────────────────────────────────
+entryRouter.post('/:id/media',            authGuard, mediaController.addMedia);
 entryRouter.delete('/:id/media/:mediaId', authGuard, mediaController.removeMedia);
+
+// ── Comments ──────────────────────────────────────────────────────────────────
+entryRouter.get('/:id/comments',                 authGuard, commentsController.getComment);
+entryRouter.post('/:id/comments',                authGuard, commentsController.createComment);
+entryRouter.delete('/:id/comments/:commentId',   authGuard, commentsController.deleteComment);
+
+// ── Reactions ─────────────────────────────────────────────────────────────────
+entryRouter.post('/:id/reactions',        authGuard, reactionsController.reactToEntry);
+entryRouter.delete('/:id/reactions',      authGuard, reactionsController.removeReaction);
+
 export default entryRouter;

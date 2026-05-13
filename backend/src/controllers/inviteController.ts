@@ -5,6 +5,10 @@ import * as invitesService from '../services/inviteService.js';
 import * as membershipsService from '../services/membershipService.js';
 import { getUserById } from '../services/userService.js';
 import { threadIdSchema, inviteSchema, updatedInviteStatusSchema } from '../schema/threadsSchema.js';
+import { sendInviteEmail } from '../lib/email.js';
+
+
+
 
 export const inviteUserToThread = async (req: AuthenticatedRequest, res: Response) => {
   const userId = req.user!.id;
@@ -21,8 +25,20 @@ export const inviteUserToThread = async (req: AuthenticatedRequest, res: Respons
     return res.status(400).json({ error: bodyResult.error.issues.map((issue) => `${issue.path}: ${issue.message}`) });
   }
   const invite = await invitesService.inviteUserToThread(idResult.data.id, bodyResult.data.email, bodyResult.data.expires_at);
+  const inviter = await getUserById(userId)
+  sendInviteEmail(
+    bodyResult.data.email,
+    thread.title,
+    inviter?.name ?? 'Jane Doe',
+    bodyResult.data.expires_at
+  ).catch(err=> console.error('[Email] Failed to send invite:',err))
   res.status(201).json(invite);
 };
+
+
+
+
+
 
 export const respondToInvite = async (req: AuthenticatedRequest, res: Response) => {
   const userId = req.user!.id;

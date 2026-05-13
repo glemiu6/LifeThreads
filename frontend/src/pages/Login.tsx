@@ -1,42 +1,60 @@
-import React, {useState} from "react";
-import {useNavigate,Link} from "react-router-dom";
-import axios from "axios";
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import api from '../api/client';
 
 export default function Login() {
-    const [email,setEmail] = useState("");
-    const [password,setPassword] = useState("");
-    const [error,setError] = useState("");
-    const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-    const hanldleSubmit = async(e:React.FormEvent)=>{
-        e.preventDefault();
-        setError("");
-        try{
-            const res = await axios.post('http://localhost:3000/api/users/auth/login',{email,password});
-            localStorage.setItem('token',res.data.token);
-            navigate('/');
-        }catch{
-            setError("Credencias invalidas");
-        }
-    };
-    return(
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <div className="bg-white p-8 rounded-x1 shadow w-full max-w-md">
-                <h1 className="text-2x1 font-bold mb-6 text-center">Entrar no Life Threads</h1>
-                {error && <p className="text-red-500 mb-4 text-sm">{error}</p>}
-                <form onSubmit={hanldleSubmit} className="flex flex-col gap-4">
-                    <input className="border rounded-lg p-3" type="email" placeholder="Email"
-                    value={email} onChange={e=>setEmail(e.target.value)} required/>
-                    <input className="border rounded-lg p-3" type="password" placeholder="Password"
-                    value={password} onChange={e=>setPassword(e.target.value)} required/>
-                    <button className="bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-semibold">
-                        Entrar
-                    </button>
-                </form>
-                <p className="text-center mt-4 text-sm text-gray-500">
-                    Não tens conta? <Link to="/regisster" className="text-blue-600 hover:underline">Registar</Link>
-                </p>
-            </div>
-        </div>
-    );
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      const res = await api.post('/api/users/auth/login', { email, password });
+      localStorage.setItem('token', res.data.token);
+      navigate('/');
+    } catch {
+      setError('Email ou password incorretos.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
+      <div style={{ background: 'white', padding: 40, borderRadius: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', width: '100%', maxWidth: 400 }}>
+        <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 24, textAlign: 'center', color: '#0f172a' }}>
+          🧵 Life Threads
+        </h1>
+        {error && (
+          <div style={{ background: '#fee2e2', color: '#dc2626', padding: '10px 14px', borderRadius: 8, marginBottom: 16, fontSize: 14 }}>
+            {error}
+          </div>
+        )}
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <input style={{ border: '1px solid #e2e8f0', borderRadius: 8, padding: '10px 14px', fontSize: 14 }}
+            type="email" placeholder="Email" value={email}
+            onChange={e => setEmail(e.target.value)} required />
+          <input style={{ border: '1px solid #e2e8f0', borderRadius: 8, padding: '10px 14px', fontSize: 14 }}
+            type="password" placeholder="Password" value={password}
+            onChange={e => setPassword(e.target.value)} required />
+          <button disabled={loading} style={{
+            background: '#2563eb', color: 'white', border: 'none', borderRadius: 8,
+            padding: '12px', fontSize: 15, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer',
+            opacity: loading ? 0.7 : 1, marginTop: 4
+          }}>
+            {loading ? 'A entrar...' : 'Entrar'}
+          </button>
+        </form>
+        <p style={{ textAlign: 'center', marginTop: 20, fontSize: 14, color: '#64748b' }}>
+          Não tens conta?{' '}
+          <Link to="/register" style={{ color: '#2563eb', textDecoration: 'none', fontWeight: 600 }}>Registar</Link>
+        </p>
+      </div>
+    </div>
+  );
 }

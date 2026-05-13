@@ -1,14 +1,23 @@
 import {prisma} from "../lib/prisma.js";
 import bcrypt from 'bcryptjs';
+import { Prisma } from '../generated/prisma/index.js';
 
 export const findAllUsers = async()=>{
     return await prisma.users.findMany();
 }
 
-export const createUser = async(name:string,email:string,password:string,bio:string,avatar:string)=>{
-    const hashedPassword = await bcrypt.hash(password, 10);
-    return await prisma.users.create({data:{name,email,password:hashedPassword,bio,avatar}})
-}
+
+export const createUser = async (name: string, email: string, password: string, bio: string, avatar: string) => {
+  const hashedPassword = await bcrypt.hash(password, 10);
+  try {
+    return await prisma.users.create({ data: { name, email, password: hashedPassword, bio, avatar } });
+  } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+      throw new Error('EMAIL_TAKEN');
+    }
+    throw err;
+  }
+};
 
 export const getUserById = async (id: number) => {
   return await prisma.users.findUnique({

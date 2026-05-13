@@ -1,54 +1,32 @@
-import {type Request, type Response} from 'express';
-import * as NotificationService from "../services/notificationService.js";
-import { NotificationIdSchema, UpdateNotificationSchema ,CreateNotificationSchema} from "../schema/notificationSchema.js";
-import {type AuthenticatedRequest} from '../middleware/authGuard.js';
+import { type Response } from 'express';
+import { type AuthenticatedRequest } from '../middleware/authGuard.js';
+import * as NotificationService from '../services/notificationService.js';
+import { NotificationIdSchema, CreateNotificationSchema } from '../schema/notificationSchema.js';
 
+export const getByUser = async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user!.id; 
+  const data = await NotificationService.getAllByUser(userId);
+  res.status(200).json(data);
+};
 
+export const markAllRead = async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user!.id;
+  await NotificationService.markAllRead(userId);
+  res.status(204).send();
+};
 
-  export const getByUser=async(req: Request, res: Response) =>{
-    
-      const result = NotificationIdSchema.safeParse(req.params.id);
-      if(!result.success){
+export const deleteNotification = async (req: AuthenticatedRequest, res: Response) => {
+  const id = NotificationIdSchema.safeParse(Number(req.params.id));
+  if (!id.success)
+    return res.status(400).json({ error: id.error.issues.map(i => `${i.path}: ${i.message}`) });
+  await NotificationService.deleteNotification(id.data);
+  res.status(204).send();
+};
 
-      }
-      const data = await NotificationService.getAllByUser(Number(req.params.userId));
-      res.status(200).json(data);
-    
-  }
-
-  export const updateStatus=async(req: Request, res: Response)=> {
-    
-      const idNotif = NotificationIdSchema.safeParse(req.params.id)
-      const result  = UpdateNotificationSchema.safeParse(req.body);
-      if (!result.success){
-        return res.status(400).json({error:result.error.issues.map((issue)=>`${issue.path}: ${issue.message}`)});
-      }
-      if(!idNotif.success){
-        return res.status(404).json({error:idNotif.error.issues.map((issue)=>`${issue.path}: ${issue.message}`)});
-      }
-      const updated = await NotificationService.updateReadStatus(idNotif.data,result.data.is_read);
-      res.status(204).json(updated);
-    
-  }
-
-  export const createNotification = async(req: Request, res: Response) => {
-    
-      const result  = CreateNotificationSchema.safeParse(req.body);
-      if (!result.success){
-        return res.status(400).json({error:result.error.issues.map((issue)=>`${issue.path}: ${issue.message}`)});
-      }
-      const created = await NotificationService.createNotification(result.data.userId,result.data.type);
-      res.status(201).json(created);
-    
-  }
-
-  export const markAllRead = async (req: Request, res: Response) => {
-    await NotificationService.markAllRead(Number(req.params.id));
-    res.status(204).send();
-  }
-
-  export const deleteNotification = async (req: Request, res: Response) => {
-    const id= Number(req.params.id);
-    await NotificationService.deleteNotification(id);
-    res.status(204).send();
-  }
+export const createNotification = async (req: AuthenticatedRequest, res: Response) => {
+  const result = CreateNotificationSchema.safeParse(req.body);
+  if (!result.success)
+    return res.status(400).json({ error: result.error.issues.map(i => `${i.path}: ${i.message}`) });
+  const created = await NotificationService.createNotification(result.data.userId, result.data.type);
+  res.status(201).json(created);
+};

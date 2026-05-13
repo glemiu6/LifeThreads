@@ -30,6 +30,18 @@ export const updateThreadsData = async (id: number, title: string, description: 
 };
 
 export const deleteThread = async (id: number) => {
+  const entries = await prisma.entry.findMany({ where: { threadId: id }, select: { id: true } });
+  const entryIds = entries.map(e => e.id);
+
+  await prisma.entryTag.deleteMany({ where: { entryId: { in: entryIds } } });
+  await prisma.entryReaction.deleteMany({ where: { entryId: { in: entryIds } } });
+  await prisma.comment.deleteMany({ where: { entryId: { in: entryIds } } });
+  await prisma.media.deleteMany({ where: { entryId: { in: entryIds } } });
+
+  await prisma.entry.deleteMany({ where: { threadId: id } });
+  await prisma.membership.deleteMany({ where: { threadId: id } });
+  await prisma.invite.deleteMany({ where: { threadsId: id } });
+
   return await prisma.threads.delete({ where: { id } });
 };
 

@@ -24,4 +24,5 @@ export const createUserSchema =z.object({
 })
 
 export const userIdSchema = z.object({
-  id: z.number().int().positive("ID inválido")});
+  id: z.coerce.number().int().positive() 
+});

@@ -1,45 +1,64 @@
-import {useState} from "react";
-import {useNavigate,Link} from "react-router-dom";
-import axios from "axios";
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import api from '../api/client';
 
 export default function Register() {
-    const [form,setForm] = useState({name:"",email:"",password:"",avatar:""})
-    const [error,setError] = useState("");
-    const navigate = useNavigate();
+  const [form, setForm] = useState({ name: '', email: '', password: '', avatar: '' });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-    const handleSubmit = async (e:React.FormEvent) => {
-        e.preventDefault();
-        setError("");
-        try{
-            await axios.post('http://localhost:3000/api/users/auth/register',form);
-            navigate('/login');
-        }catch(err:any){
-            setError(err.response?.data?.error?.[0] ?? "Erro no registo")
-        }
-    };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      await api.post('/api/users/auth/register', form);
+      navigate('/login');
+    } catch (err: any) {
+      setError(err.response?.data?.error ?? 'Erro no registo.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <div className="bg-white p-8 rounded-x1 shadow w-full max-w-md">
-                <h1 className="text2x1 font-bold mb-6 text-center">Criar Conta</h1>
-                {error && <p className="text-red-500 mb-4 text-sm">{error}</p>}
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                    {(['name','email','password','avatar'] as const).map(field=>(
-                        <input key={field} className="border rounded-lg p-3"
-                        placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-                        type={field === 'password' ? 'password' :field === 'email' ? 'email': 'text'}
-                        value={form[field]}
-                        onChange={e=>setForm({...form,[field]:e.target.value})}
-                        required={field !== 'avatar'}/>
-                    ))}
-                    <button className="bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-semibold">
-                        Registar
-                    </button>            
-                </form>
-                <p className="text-center mt-4 text-sm text-grey-500">
-                    Já tens conta? <Link to="/login" className="text-blue-600 hover:underline">Entrar</Link>
-                </p>
-            </div>
-        </div>
-    )
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
+      <div style={{ background: 'white', padding: 40, borderRadius: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', width: '100%', maxWidth: 400 }}>
+        <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 24, textAlign: 'center', color: '#0f172a' }}>
+          Criar Conta
+        </h1>
+        {error && (
+          <div style={{ background: '#fee2e2', color: '#dc2626', padding: '10px 14px', borderRadius: 8, marginBottom: 16, fontSize: 14 }}>
+            {error}
+          </div>
+        )}
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <input style={{ border: '1px solid #e2e8f0', borderRadius: 8, padding: '10px 14px', fontSize: 14 }}
+            placeholder="Nome" value={form.name}
+            onChange={e => setForm({ ...form, name: e.target.value })} required />
+          <input style={{ border: '1px solid #e2e8f0', borderRadius: 8, padding: '10px 14px', fontSize: 14 }}
+            type="email" placeholder="Email" value={form.email}
+            onChange={e => setForm({ ...form, email: e.target.value })} required />
+          <input style={{ border: '1px solid #e2e8f0', borderRadius: 8, padding: '10px 14px', fontSize: 14 }}
+            type="password" placeholder="Password" value={form.password}
+            onChange={e => setForm({ ...form, password: e.target.value })} required />
+          <input style={{ border: '1px solid #e2e8f0', borderRadius: 8, padding: '10px 14px', fontSize: 14 }}
+            placeholder="URL do avatar (opcional)" value={form.avatar}
+            onChange={e => setForm({ ...form, avatar: e.target.value })} />
+          <button disabled={loading} style={{
+            background: '#2563eb', color: 'white', border: 'none', borderRadius: 8,
+            padding: '12px', fontSize: 15, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer',
+            opacity: loading ? 0.7 : 1, marginTop: 4
+          }}>
+            {loading ? 'A registar...' : 'Criar conta'}
+          </button>
+        </form>
+        <p style={{ textAlign: 'center', marginTop: 20, fontSize: 14, color: '#64748b' }}>
+          Já tens conta?{' '}
+          <Link to="/login" style={{ color: '#2563eb', textDecoration: 'none', fontWeight: 600 }}>Entrar</Link>
+        </p>
+      </div>
+    </div>
+  );
 }

@@ -2,6 +2,8 @@ import { type Request, type Response } from "express";
 import * as userService from "../services/userService.js";
 import { createUserSchema, searchUserSchema, updateUserSchema, userIdSchema } from "../schema/userSchema.js";
 import { type AuthenticatedRequest } from '../middleware/authGuard.js';
+import { sendWelcomeEmail } from '../lib/email.js';
+
 
 export const getUsers = async (req: Request, res: Response) => {
     try {
@@ -13,34 +15,52 @@ export const getUsers = async (req: Request, res: Response) => {
 };
 
 export const createUserController = async (req: Request, res: Response) => {
-    const result = createUserSchema.safeParse(req.body);
-    if (!result.success) {
-        return res.status(400).json({ error: result.error.issues.map((issue) => `${issue.path}: ${issue.message}`) });
-    }
-    const user = await userService.createUser(result.data.name, result.data.email, result.data.password, "", result.data.avatar);
+  const result = createUserSchema.safeParse(req.body);
+  if (!result.success) {
+    return res.status(400).json({ error: result.error.issues.map(i => `${i.path}: ${i.message}`) });
+  }
+  try {
+    const user = await userService.createUser(
+      result.data.name,
+      result.data.email,
+      result.data.password,
+      '',
+      result.data.avatar
+    );
+
+    sendWelcomeEmail(user.email, user.name)
+      .then(() => console.log('[Email] Welcome email sent to:', user.email))
+      .catch(err => console.error('[Email] Welcome email failed:', err.message));
+
     res.status(201).json(user);
+  } catch (err: any) {
+    if (err.message === 'EMAIL_TAKEN') {
+      return res.status(409).json({ error: 'Este email já está registado.' });
+    }
+    res.status(500).json({ error: 'Erro interno do servidor.' });
+  }
 };
 
 export const getMe = async (req: AuthenticatedRequest, res: Response) => {
-    const result = userIdSchema.safeParse(req.params); 
-    if (!result.success) {
-        return res.status(400).json({ error: result.error.issues.map((issue) => `${issue.path}: ${issue.message}`) });
-    }
-    if (!req.user) {
-        return res.status(401).json({ error: "Utilizador não autenticado." });
-    }
-    const requestedId = result.data.id;
-    if(req.user.id !== requestedId){
-        res.status(403).json({ error: "Acesso negado. Apenas pode consultar o seu próprio perfil." });
-    }
-    try{
-        const user = await userService.getUserById(requestedId); 
-        if (!user) return res.status(404).json({ error: "Utilizador não encontrado" });
-        const{password,...safeUser} = user;
-        res.status(200).json(safeUser);
-    }catch(error){
-        res.status(500).json({error:'Erro interno do servidor.'})
-    }
+  const result = userIdSchema.safeParse(req.params);
+  if (!result.success) {
+    return res.status(400).json({ error: result.error.issues.map(i => `${i.path}: ${i.message}`) });
+  }
+  if (!req.user) {
+    return res.status(401).json({ error: 'Utilizador não autenticado.' });
+  }
+  const requestedId = result.data.id;
+  if (req.user.id !== requestedId) {
+    return res.status(403).json({ error: 'Acesso negado.' }); // ← missing return
+  }
+  try {
+    const user = await userService.getUserById(requestedId);
+    if (!user) return res.status(404).json({ error: 'Utilizador não encontrado' });
+    const { password, ...safeUser } = user;
+    res.status(200).json(safeUser);
+  } catch {
+    res.status(500).json({ error: 'Erro interno do servidor.' });
+  }
 };
 
 export const updateMe = async (req: AuthenticatedRequest, res: Response) => {
