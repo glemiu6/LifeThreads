@@ -1,0 +1,11 @@
+{"level":"error","message":"GET /api/threads | Status: 403 | 8ms","timestamp":"2026-05-21T17:07:53.968Z"}
+{"level":"error","message":"GET /api/users/7 | Status: 403 | 1ms","timestamp":"2026-05-21T17:07:53.971Z"}
+{"level":"error","message":"GET /api/users/7 | Status: 403 | 1ms","timestamp":"2026-05-21T17:07:53.973Z"}
+{"level":"error","message":"GET /api/threads | Status: 403 | 0ms","timestamp":"2026-05-21T17:07:53.974Z"}
+{"level":"error","message":"GET /api/notifications | Status: 403 | 0ms","timestamp":"2026-05-21T17:07:53.975Z"}
+{"level":"error","message":"GET /api/notifications | Status: 403 | 1ms","timestamp":"2026-05-21T17:07:53.976Z"}
+{"level":"error","message":"GET /api/threads | Status: 403 | 1ms","timestamp":"2026-05-21T17:07:58.484Z"}
+{"level":"error","message":"GET /api/threads | Status: 403 | 0ms","timestamp":"2026-05-21T17:07:58.486Z"}
+{"level":"error","message":"POST /api/threads | Status: 403 | 1ms","timestamp":"2026-05-21T17:08:02.643Z"}
+{"level":"error","message":"GET /api/threads | Status: 403 | 1ms","timestamp":"2026-05-21T17:08:08.212Z"}
+{"level":"error","message":"GET /api/threads | Status: 403 | 0ms","timestamp":"2026-05-21T17:08:08.213Z"}
