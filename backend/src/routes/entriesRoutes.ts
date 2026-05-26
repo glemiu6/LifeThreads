@@ -10,6 +10,7 @@ const entryRouter = Router();
 // ── AI static routes (MUST be before /:id) ────────────────────────────────────
 entryRouter.post('/search',               authGuard, entriesController.searchEntries);
 entryRouter.post('/draft',                authGuard, entriesController.generateEntryDraft);
+entryRouter.get('/location',             authGuard, entriesController.getLocationFromCoords);
 
 // ── Single entry CRUD ─────────────────────────────────────────────────────────
 entryRouter.get('/:id',                   authGuard, entriesController.getEntryById);

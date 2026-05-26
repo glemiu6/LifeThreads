@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import api from '../api/client';
 import Navbar from '../components/layout/Navbar';
+import { useAutoLocation } from '../hooks/useLocation';
 
 interface Entry { id: number; title: string; body: string; entry_date: string; is_published: boolean; location?: string; tags?: { tag: { name: string } }[]; }
 
 export default function ThreadDetail() {
   const { id } = useParams();
+  const { address, loading: locationLoading, error: locationError, detect, setAddress } = useAutoLocation();
   const [thread, setThread] = useState<any>(null);
   const [entries, setEntries] = useState<Entry[]>([]);
   const [form, setForm] = useState({ title: '', body: '', location: '' });
@@ -19,6 +21,12 @@ export default function ThreadDetail() {
   const [aiSearching, setAiSearching] = useState(false);
   const [activeTab, setActiveTab] = useState<'entries' | 'ai'>('entries');
 
+  useEffect(()=>{
+    if (address) setForm(prev=>({...prev,location:address}));
+  }, [address])
+
+  useEffect(()=>{
+    detect();}, [])
   useEffect(() => {
     api.get(`/api/threads/${id}`).then(r => setThread(r.data));
     api.get(`/api/threads/${id}/entries`).then(r => setEntries(r.data));
@@ -118,9 +126,31 @@ export default function ThreadDetail() {
               <textarea style={{ border: '1px solid #e2e8f0', borderRadius: 8, padding: '10px 14px', fontSize: 14, resize: 'vertical' }}
                 placeholder="Escreve a tua memória..." rows={4} value={form.body}
                 onChange={e => setForm({ ...form, body: e.target.value })} required />
-              <input style={{ border: '1px solid #e2e8f0', borderRadius: 8, padding: '10px 14px', fontSize: 14 }}
-                placeholder="Localização (opcional)" value={form.location}
-                onChange={e => setForm({ ...form, location: e.target.value })} />
+              {/* Location with auto-detect */}
+              <div style={{ display: 'flex', gap: 8 }}>
+                <input
+                  style={{ border: '1px solid #e2e8f0', borderRadius: 8, padding: '10px 14px', fontSize: 14, flex: 1 }}
+                  placeholder="Localização (opcional)"
+                  value={form.location}
+                  onChange={e => setForm({ ...form, location: e.target.value })}
+                />
+                <button
+                  type="button"
+                  onClick={detect}
+                  disabled={locationLoading}
+                  title="Detectar localização atual"
+                  style={{
+                    padding: '10px 14px', borderRadius: 8, border: '1px solid #e2e8f0',
+                    background: 'white', cursor: locationLoading ? 'not-allowed' : 'pointer',
+                    fontSize: 18, opacity: locationLoading ? 0.6 : 1, flexShrink: 0
+                  }}
+                >
+                  {locationLoading ? '⏳' : '📍'}
+                </button>
+              </div>
+              {locationError && (
+                <p style={{ color: '#dc2626', fontSize: 12, margin: '2px 0 0' }}>{locationError}</p>
+              )}
               <button style={{ background: '#2563eb', color: 'white', border: 'none', borderRadius: 8, padding: 10, fontWeight: 600, cursor: 'pointer' }}>
                 Adicionar entrada
               </button>

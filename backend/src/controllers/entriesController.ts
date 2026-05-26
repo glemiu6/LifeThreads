@@ -4,6 +4,8 @@ import * as entriesService from '../services/entriesService.js';
 import { autoTagEntry, semanticSearchEntries, generateDraft, summarizeThread, generateMonthlySummary } from '../services/aiService.js';
 import { createEntrySchema, updateEntrySchema, entryIdSchema, entryStatusSchema, draftSchema, searchEntriesSchema } from '../schema/entriesSchema.js';
 import { threadIdSchema, monthlySummarySchema } from '../schema/threadsSchema.js';
+import { coordsSchema } from '../schema/mapsSchema.js';
+import {reverseGeocode} from '../lib/maps.js';
 
 // ── Thread entries ────────────────────────────────────────────────────────────
 
@@ -150,5 +152,21 @@ export const getMonthlySummary = async (req: AuthenticatedRequest, res: Response
     res.status(200).json({ summary });
   } catch {
     res.status(503).json({ error: 'LLM unavailable, try again later' });
+  }
+};
+
+// Get /api/entries/location?lat=&lng=
+
+export const getLocationFromCoords =async (req: AuthenticatedRequest, res: Response) => {
+  const result = coordsSchema.safeParse(req.query);
+  if (!result.success){
+    return res.status(400).json({ error: result.error.issues.map(i => `${i.path}: ${i.message}`) });
+  }
+
+  try{
+    const address = await reverseGeocode(result.data.lat, result.data.lng);
+    res.status(200).json({ address });
+  } catch{
+    res.status(503).json({ error: 'Geocoding service unavailable, try again later' });
   }
 };

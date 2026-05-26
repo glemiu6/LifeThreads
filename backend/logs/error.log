@@ -9,3 +9,14 @@
 {"level":"error","message":"POST /api/threads | Status: 403 | 1ms","timestamp":"2026-05-21T17:08:02.643Z"}
 {"level":"error","message":"GET /api/threads | Status: 403 | 1ms","timestamp":"2026-05-21T17:08:08.212Z"}
 {"level":"error","message":"GET /api/threads | Status: 403 | 0ms","timestamp":"2026-05-21T17:08:08.213Z"}
+{"level":"error","message":"POST /api/users/auth/login | Status: 401 | 139ms","timestamp":"2026-05-26T01:49:31.498Z"}
+{"level":"error","message":"GET /api/entries/location?lat=38.6039808&lng=-9.1783168 | Status: 503 | 133ms","timestamp":"2026-05-26T01:59:29.358Z"}
+{"level":"error","message":"GET /api/entries/location?lat=38.6039808&lng=-9.1783168 | Status: 503 | 166ms","timestamp":"2026-05-26T01:59:29.382Z"}
+{"level":"error","message":"GET /api/entries/location?lat=38.6039808&lng=-9.1783168 | Status: 503 | 111ms","timestamp":"2026-05-26T01:59:35.525Z"}
+{"level":"error","message":"GET /api/entries/location?lat=38.6039808&lng=-9.1783168 | Status: 503 | 110ms","timestamp":"2026-05-26T01:59:55.505Z"}
+{"level":"error","message":"GET /api/entries/location?lat=38.6039808&lng=-9.1783168 | Status: 503 | 57ms","timestamp":"2026-05-26T01:59:57.321Z"}
+{"level":"error","message":"GET /api/entries/location?lat=38.6039808&lng=-9.1783168 | Status: 503 | 37ms","timestamp":"2026-05-26T01:59:57.869Z"}
+{"level":"error","message":"GET /api/entries/location?lat=38.6039808&lng=-9.1783168 | Status: 503 | 221ms","timestamp":"2026-05-26T02:04:09.550Z"}
+{"level":"error","message":"GET /api/entries/location?lat=38.6039808&lng=-9.1783168 | Status: 503 | 248ms","timestamp":"2026-05-26T02:04:09.556Z"}
+{"level":"error","message":"GET /api/entries/location?lat=38.6039808&lng=-9.1783168 | Status: 503 | 198ms","timestamp":"2026-05-26T02:04:21.184Z"}
+{"level":"error","message":"GET /api/entries/location?lat=38.6039808&lng=-9.1783168 | Status: 503 | 222ms","timestamp":"2026-05-26T02:04:21.206Z"}
