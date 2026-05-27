@@ -16,27 +16,20 @@ export const getUsers = async (req: Request, res: Response) => {
 
 export const createUserController = async (req: Request, res: Response) => {
   const result = createUserSchema.safeParse(req.body);
-  if (!result.success) {
+  if (!result.success)
     return res.status(400).json({ error: result.error.issues.map(i => `${i.path}: ${i.message}`) });
-  }
-  try {
-    const user = await userService.createUser(
-      result.data.name,
-      result.data.email,
-      result.data.password,
-      '',
-      result.data.avatar
-    );
 
+  try {
+    const user = await userService.createUser(result.data.name, result.data.email, result.data.password, '', result.data.avatar);
+    
     sendWelcomeEmail(user.email, user.name)
-      .then(() => console.log('[Email] Welcome email sent to:', user.email))
       .catch(err => console.error('[Email] Welcome email failed:', err.message));
 
-    res.status(201).json(user);
+    const { password, ...safeUser } = user;
+    res.status(201).json(safeUser);
   } catch (err: any) {
-    if (err.message === 'EMAIL_TAKEN') {
+    if (err.message === 'EMAIL_TAKEN')
       return res.status(409).json({ error: 'Este email já está registado.' });
-    }
     res.status(500).json({ error: 'Erro interno do servidor.' });
   }
 };
@@ -64,18 +57,32 @@ export const getMe = async (req: AuthenticatedRequest, res: Response) => {
 };
 
 export const updateMe = async (req: AuthenticatedRequest, res: Response) => {
-    const idUser = Number(req.params.id);
-    
-    if (!req.user || req.user.id !== idUser) {
-        return res.status(403).json({ error: "Acesso negado. Apenas pode alterar o seu próprio perfil." });
-    }
+  const idUser = Number(req.params.id);
 
-    const result = updateUserSchema.safeParse(req.body);
-    if (!result.success) {
-        return res.status(400).json({ error: result.error.issues.map((issue) => `${issue.path}: ${issue.message}`) });
-    }
-    const updated = await userService.updateUserService(idUser, String(result.data.name), String(result.data.email), String(result.data.bio), String(result.data.avatar));
-    res.status(200).json(updated);
+  if (!req.user || req.user.id !== idUser)
+    return res.status(403).json({ error: 'Acesso negado.' });
+
+  const result = updateUserSchema.safeParse(req.body);
+  if (!result.success)
+    return res.status(400).json({ error: result.error.issues.map(i => `${i.path}: ${i.message}`) });
+
+  try {
+    const current = await userService.getUserById(idUser);
+    if (!current) return res.status(404).json({ error: 'Utilizador não encontrado' });
+
+    const updated = await userService.updateUserService(
+      idUser,
+      result.data.name ?? current.name,
+      result.data.email ?? current.email,
+      result.data.bio ?? current.bio ?? '',
+      result.data.avatar ?? current.avatar ?? ''
+    );
+
+    const { password, ...safeUser } = updated;
+    res.status(200).json(safeUser);
+  } catch {
+    res.status(500).json({ error: 'Erro interno do servidor.' });
+  }
 };
 
 export const deleteMe = async (req: AuthenticatedRequest, res: Response) => {

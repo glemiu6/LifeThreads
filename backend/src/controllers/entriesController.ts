@@ -7,7 +7,6 @@ import { threadIdSchema, monthlySummarySchema } from '../schema/threadsSchema.js
 import { coordsSchema } from '../schema/mapsSchema.js';
 import {reverseGeocode} from '../lib/maps.js';
 
-// ── Thread entries ────────────────────────────────────────────────────────────
 
 export const createEntry = async (req: AuthenticatedRequest, res: Response) => {
   const threadId = Number(req.params.id);
@@ -25,7 +24,6 @@ export const listEntriesByThread = async (req: Request, res: Response) => {
   res.status(200).json(entries);
 };
 
-// ── Single entry CRUD ─────────────────────────────────────────────────────────
 
 export const getEntryById = async (req: Request, res: Response) => {
   const result = entryIdSchema.safeParse(Number(req.params.id));
@@ -56,7 +54,6 @@ export const deleteEntry = async (req: Request, res: Response) => {
   res.status(204).send();
 };
 
-// ── Entry status  ─────────────────────
 
 export const updateStatus = async (req: Request, res: Response) => {
   const idResult = entryIdSchema.safeParse(Number(req.params.id));
@@ -71,9 +68,7 @@ export const updateStatus = async (req: Request, res: Response) => {
   res.status(200).json(updated);
 };
 
-// ── AI ────────────────────────────────────────────────────────────────────────
 
-// POST /api/entries/:id/tags
 export const tagEntry = async (req: AuthenticatedRequest, res: Response) => {
   const result = entryIdSchema.safeParse(Number(req.params.id));
   if (!result.success)
@@ -90,7 +85,6 @@ export const tagEntry = async (req: AuthenticatedRequest, res: Response) => {
   }
 };
 
-// POST /api/entries/search
 export const searchEntries = async (req: AuthenticatedRequest, res: Response) => {
   const userId = req.user!.id;
   const result = searchEntriesSchema.safeParse(req.body);
@@ -109,7 +103,6 @@ export const searchEntries = async (req: AuthenticatedRequest, res: Response) =>
   }
 };
 
-// POST /api/entries/draft
 export const generateEntryDraft = async (req: AuthenticatedRequest, res: Response) => {
   const result = draftSchema.safeParse(req.body);
   if (!result.success)
@@ -123,7 +116,6 @@ export const generateEntryDraft = async (req: AuthenticatedRequest, res: Respons
   }
 };
 
-// GET /api/threads/:id/summary
 export const getThreadSummary = async (req: AuthenticatedRequest, res: Response) => {
   const userId = req.user!.id;
   const result = threadIdSchema.safeParse(req.params);
@@ -140,7 +132,6 @@ export const getThreadSummary = async (req: AuthenticatedRequest, res: Response)
   }
 };
 
-// GET /api/threads/summary?year=&month=
 export const getMonthlySummary = async (req: AuthenticatedRequest, res: Response) => {
   const userId = req.user!.id;
   const result = monthlySummarySchema.safeParse(req.query);
@@ -155,7 +146,6 @@ export const getMonthlySummary = async (req: AuthenticatedRequest, res: Response
   }
 };
 
-// Get /api/entries/location?lat=&lng=
 
 export const getLocationFromCoords =async (req: AuthenticatedRequest, res: Response) => {
   const result = coordsSchema.safeParse(req.query);

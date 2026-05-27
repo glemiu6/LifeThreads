@@ -42,3 +42,4 @@ app.use((_req,_res,next)=>{
 app.use(errorHandler);
 
 app.listen(3000, () => console.log('server running on http://localhost:3000'));
+export default app;

@@ -1,6 +1,8 @@
-import {z} from 'zod';
+// mediaController.ts
+import { z } from 'zod';
 
 export const mediaSchema = z.object({
-    url:z.string().url(),
-    type:z.enum(['IMAGE','VIDEO','DOCUMENT'])
-})
+  url: z.string().url(),
+  type: z.string().min(1) 
+                           
+});

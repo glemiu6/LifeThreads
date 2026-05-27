@@ -14,9 +14,9 @@ export const reactToEntry = async (req:AuthenticatedRequest,res:Response) => {
     res.status(201).json(reaction);
 }
 
-export const removeReaction = async(req:AuthenticatedRequest,res:Response) => {
-    const userId = req.user?.id;
-    const entryId = Number(req.params.id);
-    const reaction = await reactionService.removeReaction(userId!,entryId);
-    res.status(200).json(reaction);
-}
+export const removeReaction = async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user!.id;
+  const entryId = Number(req.params.id);
+  await reactionService.removeReaction(userId, entryId);
+  res.status(204).send(); // ← make sure it's 204 not 200
+};
